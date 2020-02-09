@@ -9,7 +9,12 @@ tablegen(LLVM MachineGenCallingConv.inc -gen-callingconv)
 
 add_public_tablegen_target(MachineCommonTableGen)
 
-add_llvm_target(#MachineCodeGen
+add_llvm_target(MachineCodeGen
+  MachineSubtarget.cpp
+  MachineTargetMachine.cpp
+)
+
+#   MachineCodeGen
 #   MachineAsmPrinter.cpp
 #   MachineDelaySlotFiller.cpp
 #   MachineFrameLowering.cpp
@@ -21,7 +26,5 @@ add_llvm_target(#MachineCodeGen
 #   MachineMemAluCombiner.cpp
 #   MachineRegisterInfo.cpp
 #   MachineSelectionDAGInfo.cpp
-   MachineSubtarget.cpp
-   MachineTargetMachine.cpp
 #   MachineTargetObjectFile.cpp
-)
+#)

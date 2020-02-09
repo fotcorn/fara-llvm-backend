@@ -24,8 +24,8 @@ include "llvm/Target/Target.td"
 //===----------------------------------------------------------------------===//
 
 include "MachineRegisterInfo.td"
-include "MachineCallingConv.td"
-include "MachineInstrInfo.td"
+// include "MachineCallingConv.td"
+// include "MachineInstrInfo.td"
 
 def MachineInstrInfo : InstrInfo;
 
@@ -42,7 +42,7 @@ def : Proc<"machine",      []>;
 // Declare the target which we are implementing
 //===----------------------------------------------------------------------===//
 
-def Machine : Target {
-  // Pull in Instruction Info:
-  let InstructionSet = MachineInstrInfo;
-}
+// def Machine : Target {
+//   // Pull in Instruction Info:
+//   let InstructionSet = MachineInstrInfo;
+// }
