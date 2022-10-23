@@ -1,5 +1,5 @@
 
-//===-- MachineSubtarget.cpp - Machine Subtarget Information
+//===-- FARASubtarget.cpp - FARA Subtarget Information
 //------------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -8,27 +8,27 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the Machine specific subclass of TargetSubtargetInfo.
+// This file implements the FARA specific subclass of TargetSubtargetInfo.
 //
 //===----------------------------------------------------------------------===//
 
-#include "MachineSubtarget.h"
+#include "FARASubtarget.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/TargetRegistry.h"
 
 using namespace llvm;
 
-#define DEBUG_TYPE "machine-subtarget"
+#define DEBUG_TYPE "fara-subtarget"
 
 #define GET_SUBTARGETINFO_TARGET_DESC
 #define GET_SUBTARGETINFO_CTOR
-#include "MachineGenSubtargetInfo.inc"
+#include "FARAGenSubtargetInfo.inc"
 
-void MachineSubtarget::anchor() {}
+void FARASubtarget::anchor() {}
 
-MachineSubtarget::MachineSubtarget(const Triple &TT, const std::string &CPU,
+FARASubtarget::FARASubtarget(const Triple &TT, const std::string &CPU,
                                    const std::string &FS,
                                    const TargetMachine &TM)
-    : MachineGenSubtargetInfo(TT, CPU, FS) /*, InstrInfo(),
+    : FARAGenSubtargetInfo(TT, CPU, FS) /*, InstrInfo(),
       FrameLowering(*this), TLInfo(TM, *this)*/
 {}

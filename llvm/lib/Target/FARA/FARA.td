@@ -1,4 +1,4 @@
-//===-- Machine.td - Describe the Machine Target Machine -------------*- tablegen -*-===//
+//===-- FARA.td - Describe the FARA Target FARA -------------*- tablegen -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -16,33 +16,33 @@
 include "llvm/Target/Target.td"
 
 //===----------------------------------------------------------------------===//
-// Machine Subtarget features.
+// FARA Subtarget features.
 //
 
 //===----------------------------------------------------------------------===//
 // Register File, Calling Conv, Instruction Descriptions
 //===----------------------------------------------------------------------===//
 
-include "MachineRegisterInfo.td"
-// include "MachineCallingConv.td"
- include "MachineInstrInfo.td"
+include "FARARegisterInfo.td"
+// include "FARACallingConv.td"
+ include "FARAInstrInfo.td"
 
-def MachineInstrInfo : InstrInfo;
+def FARAInstrInfo : InstrInfo;
 
 //===----------------------------------------------------------------------===//
-// Machine processors supported.
+// FARA processors supported.
 //===----------------------------------------------------------------------===//
 
 class Proc<string Name, list<SubtargetFeature> Features>
  : Processor<Name, NoItineraries, Features>;
 
-def : Proc<"machine",      []>;
+def : Proc<"FARA",      []>;
 
 //===----------------------------------------------------------------------===//
 // Declare the target which we are implementing
 //===----------------------------------------------------------------------===//
 
-def Machine : Target {
+def FARA : Target {
     // Pull in Instruction Info:
-    let InstructionSet = MachineInstrInfo;
+    let InstructionSet = FARAInstrInfo;
 }

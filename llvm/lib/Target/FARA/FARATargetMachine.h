@@ -1,17 +1,17 @@
-#ifndef LLVM_LIB_TARGET_MACHINE_MACHINETARGETMACHINE_H
-#define LLVM_LIB_TARGET_MACHINE_MACHINETARGETMACHINE_H
+#ifndef LLVM_LIB_TARGET_FARA_FARATARGETMACHINE_H
+#define LLVM_LIB_TARGET_FARA_FARATARGETMACHINE_H
 
-#include "MachineSubtarget.h"
+#include "FARASubtarget.h"
 #include "llvm/Target/TargetMachine.h"
 
 namespace llvm {
 
-class MachineTargetMachine : public LLVMTargetMachine {
-  MachineSubtarget Subtarget;
+class FARATargetMachine : public LLVMTargetMachine {
+  FARASubtarget Subtarget;
   std::unique_ptr<TargetLoweringObjectFile> TLOF;
 
 public:
-  MachineTargetMachine(const Target &T, const Triple &TT, StringRef CPU,
+  FARATargetMachine(const Target &T, const Triple &TT, StringRef CPU,
                        StringRef FS, const TargetOptions &Options,
                        Optional<Reloc::Model> RM, Optional<CodeModel::Model> CM,
                        CodeGenOpt::Level OL, bool JIT);
@@ -31,4 +31,4 @@ public:
 };
 } // namespace llvm
 
-#endif /* LLVM_LIB_TARGET_MACHINE_MACHINETARGETMACHINE_H */
+#endif /* LLVM_LIB_TARGET_FARA_FARATARGETMACHINE_H */

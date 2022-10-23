@@ -6,17 +6,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "TargetInfo/MachineTargetInfo.h"
+#include "TargetInfo/FARATargetInfo.h"
 #include "llvm/Support/TargetRegistry.h"
 
 using namespace llvm;
 
-Target &llvm::getTheMachineTarget() {
-  static Target TheMachineTarget;
-  return TheMachineTarget;
+Target &llvm::getTheFARATarget() {
+  static Target TheFARATarget;
+  return TheFARATarget;
 }
 
 extern "C" void LLVMInitializeVETargetInfo() {
-  RegisterTarget<Triple::machine, /*HasJIT=*/false> X(
-      getTheMachineTarget(), "machine", "Machine", "Machine");
+  RegisterTarget<Triple::fara, /*HasJIT=*/false> X(
+      getTheFARATarget(), "fara", "FARA", "FARA");
 }

@@ -1,4 +1,4 @@
-//===-- MachineTargetInfo.h - Machine Target Implementation ---------*- C++
+//===-- FARATargetInfo.h - FARA Target Implementation ---------*- C++
 //-*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -7,15 +7,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_MACHINE_TARGETINFO_MACHINETARGETINFO_H
-#define LLVM_LIB_TARGET_MACHINE_TARGETINFO_MACHINETARGETINFO_H
+#ifndef LLVM_LIB_TARGET_FARA_TARGETINFO_FARATARGETINFO_H
+#define LLVM_LIB_TARGET_FARA_TARGETINFO_FARATARGETINFO_H
 
 namespace llvm {
 
 class Target;
 
-Target &getTheMachineTarget();
+Target &getTheFARATarget();
 
 } // namespace llvm
 
-#endif // LLVM_LIB_TARGET_MACHINE_TARGETINFO_MACHINETARGETINFO_H
+#endif // LLVM_LIB_TARGET_FARA_TARGETINFO_FARATARGETINFO_H
