@@ -1,30 +1,38 @@
+add_llvm_component_group(FARA)
+
 set(LLVM_TARGET_DEFINITIONS FARA.td)
 
-tablegen(LLVM FARAGenRegisterInfo.inc -gen-register-info)
-tablegen(LLVM FARAGenInstrInfo.inc -gen-instr-info)
+tablegen(LLVM FARAGenAsmMatcher.inc -gen-asm-matcher)
 tablegen(LLVM FARAGenAsmWriter.inc -gen-asm-writer)
-tablegen(LLVM FARAGenDAGISel.inc -gen-dag-isel)
-tablegen(LLVM FARAGenSubtargetInfo.inc -gen-subtarget)
 tablegen(LLVM FARAGenCallingConv.inc -gen-callingconv)
+tablegen(LLVM FARAGenDAGISel.inc -gen-dag-isel)
+tablegen(LLVM FARAGenDisassemblerTables.inc -gen-disassembler)
+tablegen(LLVM FARAGenInstrInfo.inc -gen-instr-info)
+tablegen(LLVM FARAGenMCCodeEmitter.inc -gen-emitter)
+tablegen(LLVM FARAGenRegisterInfo.inc -gen-register-info)
+tablegen(LLVM FARAGenSubtargetInfo.inc -gen-subtarget)
 
 add_public_tablegen_target(FARACommonTableGen)
 
 add_llvm_target(FARACodeGen
   FARASubtarget.cpp
   FARATargetMachine.cpp
-)
 
-#   FARACodeGen
-#   FARAAsmPrinter.cpp
-#   FARADelaySlotFiller.cpp
-#   FARAFrameLowering.cpp
-#   FARAInstrInfo.cpp
-#   FARAISelDAGToDAG.cpp
-#   FARAISelLowering.cpp
-#   FARAMachineFunctionInfo.cpp
-#   FARAMCInstLower.cpp
-#   FARAMemAluCombiner.cpp
-#   FARARegisterInfo.cpp
-#   FARASelectionDAGInfo.cpp
-#   FARATargetObjectFile.cpp
-#)
+  LINK_COMPONENTS
+  Analysis
+  AsmPrinter
+  CodeGen
+  Core
+  MC
+  IPO
+  Scalar
+  SelectionDAG
+  Support
+  Target
+  TransformUtils
+
+  ADD_TO_COMPONENT
+  FARA
+  )
+
+add_subdirectory(TargetInfo)
