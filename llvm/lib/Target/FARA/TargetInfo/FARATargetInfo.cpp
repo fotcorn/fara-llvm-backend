@@ -1,4 +1,4 @@
-//===-- VETargetInfo.cpp - VE Target Implementation -----------------------===//
+//===-- FARATargetInfo.cpp - FARA Target Implementation -----------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -7,8 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "TargetInfo/FARATargetInfo.h"
-#include "llvm/Support/TargetRegistry.h"
-
+#include "llvm/MC/TargetRegistry.h"
 using namespace llvm;
 
 Target &llvm::getTheFARATarget() {
@@ -16,7 +15,7 @@ Target &llvm::getTheFARATarget() {
   return TheFARATarget;
 }
 
-extern "C" void LLVMInitializeVETargetInfo() {
+extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeFARATargetInfo() {
   RegisterTarget<Triple::fara, /*HasJIT=*/false> X(
       getTheFARATarget(), "fara", "FARA", "FARA");
 }

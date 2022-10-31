@@ -8,7 +8,6 @@ namespace llvm {
 
 class FARATargetMachine : public LLVMTargetMachine {
   FARASubtarget Subtarget;
-  std::unique_ptr<TargetLoweringObjectFile> TLOF;
 
 public:
   FARATargetMachine(const Target &T, const Triple &TT, StringRef CPU,
@@ -16,11 +15,12 @@ public:
                        Optional<Reloc::Model> RM, Optional<CodeModel::Model> CM,
                        CodeGenOpt::Level OL, bool JIT);
 
-  const TargetSubtarget *
-  getSubtargetImpl(const llvm::Function & /*Fn*/) const override {
+  const FARASubtarget *getSubtargetImpl() const { return &Subtarget; }
+  const FARASubtarget *getSubtargetImpl(const Function &) const override {
     return &Subtarget;
   }
 
+  /*
   TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
 
   TargetTransformInfo getTargetTransformInfo(const Function &F) override;
@@ -28,6 +28,7 @@ public:
   TargetLoweringObjectFile *getObjFileLowering() const override {
     return TLOF.get();
   }
+  */
 };
 } // namespace llvm
 

@@ -24,8 +24,8 @@ include "llvm/Target/Target.td"
 //===----------------------------------------------------------------------===//
 
 include "FARARegisterInfo.td"
-// include "FARACallingConv.td"
- include "FARAInstrInfo.td"
+include "FARACallingConv.td"
+include "FARAInstrInfo.td"
 
 def FARAInstrInfo : InstrInfo;
 

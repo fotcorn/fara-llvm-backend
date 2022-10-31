@@ -1,0 +1,59 @@
+//===-- FARATargetMachine.cpp - Define TargetMachine for FARA -----------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+//
+//===----------------------------------------------------------------------===//
+
+#include "FARATargetMachine.h"
+#include "TargetInfo/FARATargetInfo.h"
+#include "llvm/MC/TargetRegistry.h"
+#include "llvm/Target/TargetMachine.h"
+
+using namespace llvm;
+
+#define DEBUG_TYPE "fara"
+
+extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeFARATarget() {
+  // Register the target.
+  RegisterTargetMachine<FARATargetMachine> X(getTheFARATarget());
+}
+
+static std::string computeDataLayout() {
+  // little endian
+  std::string Ret = "e";
+
+  // ELF mangling
+  Ret += "-m:e";
+
+  // 64 bit integers alignment is 64bit.
+  Ret += "-i64:64";
+
+  // 64 bit registers
+  Ret += "-n64";
+
+  // Stack alignment is 128 bits
+  Ret += "-S128";
+
+  return Ret;
+}
+
+static Reloc::Model getEffectiveRelocModel(Optional<Reloc::Model> RM) {
+  return RM.value_or(Reloc::Static);
+}
+
+FARATargetMachine::FARATargetMachine(const Target &T, const Triple &TT,
+                                       StringRef CPU, StringRef FS,
+                                       const TargetOptions &Options,
+                                       Optional<Reloc::Model> RM,
+                                       Optional<CodeModel::Model> CM,
+                                       CodeGenOpt::Level OL, bool JIT)
+    : LLVMTargetMachine(T, computeDataLayout(), TT, CPU, FS, Options,
+                        getEffectiveRelocModel(RM),
+                        getEffectiveCodeModel(CM, CodeModel::Small), OL),
+                        Subtarget(TT, std::string(CPU), std::string(FS), *this) {
+}

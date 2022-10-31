@@ -17,6 +17,7 @@ add_public_tablegen_target(FARACommonTableGen)
 add_llvm_target(FARACodeGen
   FARASubtarget.cpp
   FARATargetMachine.cpp
+  FARAInstrInfo.cpp
 
   LINK_COMPONENTS
   Analysis
@@ -24,6 +25,8 @@ add_llvm_target(FARACodeGen
   CodeGen
   Core
   MC
+  FARADesc
+  FARAInfo
   IPO
   Scalar
   SelectionDAG
@@ -36,3 +39,4 @@ add_llvm_target(FARACodeGen
   )
 
 add_subdirectory(TargetInfo)
+add_subdirectory(MCTargetDesc)

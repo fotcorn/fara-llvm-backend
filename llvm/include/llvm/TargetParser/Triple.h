@@ -105,6 +105,7 @@ public:
     wasm64,         // WebAssembly with 64-bit pointers
     renderscript32, // 32-bit RenderScript
     renderscript64, // 64-bit RenderScript
+    fara,           // FARA Research Architecture 64-bit
     ve,             // NEC SX-Aurora Vector Engine
     LastArchType = ve
   };

@@ -11,9 +11,9 @@
 //===----------------------------------------------------------------------===//
 
 class FARAReg<bits<8> Enc, string n> : Register<n> {
-    let HWEncoding{15-8} = 0;
-    let HWEncoding{7-0} = Enc;
-    let Namespace = "FARA";
+  let HWEncoding{15-8} = 0;
+  let HWEncoding{7-0} = Enc;
+  let Namespace = "FARA";
 }
 
 def I0 : FARAReg<1, "i0">, DwarfRegNum<[1]>;
