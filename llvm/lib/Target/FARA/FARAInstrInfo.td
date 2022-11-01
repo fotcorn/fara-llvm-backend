@@ -1,14 +1,51 @@
 include "FARAInstrFormats.td"
 
+def ADD8S : FARAInst<1, 8,
+  (outs IntRegs:$dst),
+  (ins IntRegs:$src1, IntRegs:$src2),
+  "add8s $src1, $src2",
+  [(set i64:$dst, (add i64:$src1, i64:$src2))]>
+{
+  let Constraints = "$src2 = $dst";
+}
+def ADDS : MnemonicAlias<"adds", "add8s">;
+def ADD : MnemonicAlias<"add", "add8s">;
 
-def add8s : FARAInst<1, 8, (outs IntRegs:$dst),
-        (ins IntRegs:$src1, IntRegs:$src2),
-        "add8s $src1, $src2, $dst",
-        [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
+def SUB8S : FARAInst<2, 8,
+  (outs IntRegs:$dst),
+  (ins IntRegs:$src1, IntRegs:$src2),
+  "sub8s $src1, $src2",
+  [(set i64:$dst, (sub i64:$src1, i64:$src2))]>
+{
+  let Constraints = "$src2 = $dst";
+}
+def SUBS : MnemonicAlias<"subs", "sub8s">;
+def SUB : MnemonicAlias<"sub", "sub8s">;
 
-/*
-def add4s : FARAInst<1, 4, (outs IntRegs:$dst),
-        (ins IntRegs:$src1, IntRegs:$src2),
-        "add4s $src1, $src2, $dst",
-        [(set i32:$dst, (add i32:$src1, i32:$src2))]>;
-*/
+def MOV8Reg : FARAInst<3, 8,
+  (outs IntRegs:$dst),
+  (ins IntRegs:$src),
+  "mov8 $src, $dst",
+  [(set i64:$dst, i64:$src)]>;
+
+def MOV8Imm : FARAInst<4, 8,
+  (outs IntRegs:$dst),
+  (ins i64imm:$src),
+  "mov8 $src, $dst",
+  [(set i64:$dst, i64:$src)]>;
+
+def MOV : MnemonicAlias<"mov", "mov8">;
+
+def STR8 : FARAInst<5, 8,
+  (outs i64imm:$dst),
+  (ins IntRegs:$src),
+  "str8 $src, $dst",
+  [(set i64:$dst, i64:$src)]>;
+def STR : MnemonicAlias<"str", "str8">;
+
+def LD8 : FARAInst<5, 8,
+  (outs i64imm:$dst),
+  (ins IntRegs:$src),
+  "ld8 $src, $dst",
+  [(set i64:$dst, i64:$src)]>;
+def LD : MnemonicAlias<"ld", "ld8">;
