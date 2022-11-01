@@ -13,7 +13,7 @@
 #include "FARAMCTargetDesc.h"
 //#include "FARAELFStreamer.h"
 //#include "FARAInstPrinter.h"
-//#include "FARAMCAsmInfo.h"
+#include "FARAMCAsmInfo.h"
 //#include "FARAMCObjectFileInfo.h"
 //#include "FARATargetStreamer.h"
 #include "TargetInfo/FARATargetInfo.h"
@@ -54,11 +54,11 @@ static MCRegisterInfo *createFARAMCRegisterInfo(const Triple &TT) {
   InitFARAMCRegisterInfo(X, FARA::PC);
   return X;
 }
-/*
+
 static MCAsmInfo *createFARAMCAsmInfo(const MCRegisterInfo &MRI,
                                        const Triple &TT,
                                        const MCTargetOptions &Options) {
-  MCAsmInfo *MAI = new FARAMCAsmInfo(TT);
+  MCAsmInfo *MAI = new FARAELFMCAsmInfo(TT);
 
   MCRegister SP = MRI.getDwarfRegNum(FARA::SP, true);
   MCCFIInstruction Inst = MCCFIInstruction::cfiDefCfa(nullptr, SP, 0);
@@ -66,7 +66,7 @@ static MCAsmInfo *createFARAMCAsmInfo(const MCRegisterInfo &MRI,
 
   return MAI;
 }
-
+/*
 static MCObjectFileInfo *
 createFARAMCObjectFileInfo(MCContext &Ctx, bool PIC,
                             bool LargeCodeModel = false) {
@@ -116,7 +116,7 @@ static MCInstrAnalysis *createFARAInstrAnalysis(const MCInstrInfo *Info) {
 
 extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeFARATargetMC() {
   for (Target *T : {&getTheFARATarget()}) {
-    //TargetRegistry::RegisterMCAsmInfo(*T, createFARAMCAsmInfo);
+    TargetRegistry::RegisterMCAsmInfo(*T, createFARAMCAsmInfo);
     //TargetRegistry::RegisterMCObjectFileInfo(*T, createFARAMCObjectFileInfo);
     TargetRegistry::RegisterMCInstrInfo(*T, createFARAMCInstrInfo);
     TargetRegistry::RegisterMCRegInfo(*T, createFARAMCRegisterInfo);

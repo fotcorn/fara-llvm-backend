@@ -56,4 +56,5 @@ FARATargetMachine::FARATargetMachine(const Target &T, const Triple &TT,
                         getEffectiveRelocModel(RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
                         Subtarget(TT, std::string(CPU), std::string(FS), *this) {
+  initAsmInfo();
 }
