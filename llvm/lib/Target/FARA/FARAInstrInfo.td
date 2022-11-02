@@ -49,3 +49,31 @@ def LD8 : FARAInst<5, 8,
   "ld8 $src, $dst",
   [(set i64:$dst, i64:$src)]>;
 def LD : MnemonicAlias<"ld", "ld8">;
+
+def OUT1Imm : FARAInst<5, 1,
+  (outs),
+  (ins i8imm:$descriptor, i8imm:$character),
+  "out1 $descriptor, $character",
+  []>
+{
+  let hasSideEffects = 1;
+}
+
+def OUT1Reg : FARAInst<5, 1,
+  (outs),
+  (ins i8imm:$descriptor, IntRegs:$character),
+  "out1 $descriptor, $character",
+  []>
+{
+  let hasSideEffects = 1;
+}
+def OUT : MnemonicAlias<"out", "out1">;
+
+def HALT : FARAInst<5, 0,
+  (outs),
+  (ins),
+  "halt",
+  []>
+{
+  let hasSideEffects = 1;
+}
