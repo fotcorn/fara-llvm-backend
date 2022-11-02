@@ -1,6 +1,6 @@
 include "FARAInstrFormats.td"
 
-def ADD8S : FARAInst<1, 8,
+def ADD8S : FARAInst<0x0101, 8,
   (outs IntRegs:$dst),
   (ins IntRegs:$src1, IntRegs:$src2),
   "add8s $src1, $src2",
@@ -11,7 +11,7 @@ def ADD8S : FARAInst<1, 8,
 def ADDS : MnemonicAlias<"adds", "add8s">;
 def ADD : MnemonicAlias<"add", "add8s">;
 
-def SUB8S : FARAInst<2, 8,
+def SUB8S : FARAInst<0x0102, 8,
   (outs IntRegs:$dst),
   (ins IntRegs:$src1, IntRegs:$src2),
   "sub8s $src1, $src2",
@@ -22,13 +22,13 @@ def SUB8S : FARAInst<2, 8,
 def SUBS : MnemonicAlias<"subs", "sub8s">;
 def SUB : MnemonicAlias<"sub", "sub8s">;
 
-def MOV8Reg : FARAInst<3, 8,
+def MOV8Reg : FARAInst<0x0001, 8,
   (outs IntRegs:$dst),
   (ins IntRegs:$src),
   "mov8 $src, $dst",
   [(set i64:$dst, i64:$src)]>;
 
-def MOV8Imm : FARAInst<4, 8,
+def MOV8Imm : FARAInst<0x0001, 8,
   (outs IntRegs:$dst),
   (ins i64imm:$src),
   "mov8 $src, $dst",
@@ -36,21 +36,21 @@ def MOV8Imm : FARAInst<4, 8,
 
 def MOV : MnemonicAlias<"mov", "mov8">;
 
-def STR8 : FARAInst<5, 8,
+def STR8 : FARAInst<0x0003, 8,
   (outs i64imm:$dst),
   (ins IntRegs:$src),
   "str8 $src, $dst",
   [(set i64:$dst, i64:$src)]>;
 def STR : MnemonicAlias<"str", "str8">;
 
-def LD8 : FARAInst<5, 8,
+def LD8 : FARAInst<0x0002, 8,
   (outs i64imm:$dst),
   (ins IntRegs:$src),
   "ld8 $src, $dst",
   [(set i64:$dst, i64:$src)]>;
 def LD : MnemonicAlias<"ld", "ld8">;
 
-def OUT1Imm : FARAInst<5, 1,
+def OUT1Imm : FARAInst<0x0602, 1,
   (outs),
   (ins i8imm:$descriptor, i8imm:$character),
   "out1 $descriptor, $character",
@@ -59,7 +59,7 @@ def OUT1Imm : FARAInst<5, 1,
   let hasSideEffects = 1;
 }
 
-def OUT1Reg : FARAInst<5, 1,
+def OUT1Reg : FARAInst<0x0602, 1,
   (outs),
   (ins i8imm:$descriptor, IntRegs:$character),
   "out1 $descriptor, $character",
@@ -69,7 +69,7 @@ def OUT1Reg : FARAInst<5, 1,
 }
 def OUT : MnemonicAlias<"out", "out1">;
 
-def HALT : FARAInst<5, 0,
+def HALT : FARAInst<0x0801, 0,
   (outs),
   (ins),
   "halt",
