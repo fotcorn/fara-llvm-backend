@@ -1,6 +1,7 @@
 add_llvm_component_library(LLVMFARADesc
   FARAMCTargetDesc.cpp
   FARAMCAsmInfo.cpp
+  FARATargetStreamer.cpp
 
   LINK_COMPONENTS
   MC

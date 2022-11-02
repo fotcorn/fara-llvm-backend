@@ -15,7 +15,7 @@
 //#include "FARAInstPrinter.h"
 #include "FARAMCAsmInfo.h"
 //#include "FARAMCObjectFileInfo.h"
-//#include "FARATargetStreamer.h"
+#include "FARATargetStreamer.h"
 #include "TargetInfo/FARATargetInfo.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/MC/MCAsmBackend.h"
@@ -56,8 +56,8 @@ static MCRegisterInfo *createFARAMCRegisterInfo(const Triple &TT) {
 }
 
 static MCAsmInfo *createFARAMCAsmInfo(const MCRegisterInfo &MRI,
-                                       const Triple &TT,
-                                       const MCTargetOptions &Options) {
+                                      const Triple &TT,
+                                      const MCTargetOptions &Options) {
   MCAsmInfo *MAI = new FARAELFMCAsmInfo(TT);
 
   MCRegister SP = MRI.getDwarfRegNum(FARA::SP, true);
@@ -77,7 +77,7 @@ createFARAMCObjectFileInfo(MCContext &Ctx, bool PIC,
 */
 
 static MCSubtargetInfo *createFARAMCSubtargetInfo(const Triple &TT,
-                                                   StringRef CPU, StringRef FS) {
+                                                  StringRef CPU, StringRef FS) {
   return createFARAMCSubtargetInfoImpl(TT, CPU, /*TuneCPU*/ CPU, FS);
 }
 
@@ -97,11 +97,12 @@ createFARAObjectTargetStreamer(MCStreamer &S, const MCSubtargetInfo &STI) {
     return new FARATargetELFStreamer(S, STI);
   return nullptr;
 }
+*/
 
 static MCTargetStreamer *createFARAAsmTargetStreamer(MCStreamer &S,
-                                                      formatted_raw_ostream &OS,
-                                                      MCInstPrinter *InstPrint,
-                                                      bool isVerboseAsm) {
+                                                     formatted_raw_ostream &OS,
+                                                     MCInstPrinter *InstPrint,
+                                                     bool isVerboseAsm) {
   return new FARATargetAsmStreamer(S, OS);
 }
 
@@ -109,6 +110,7 @@ static MCTargetStreamer *createFARANullTargetStreamer(MCStreamer &S) {
   return new FARATargetStreamer(S);
 }
 
+/*
 static MCInstrAnalysis *createFARAInstrAnalysis(const MCInstrInfo *Info) {
   return new FARAMCInstrAnalysis(Info);
 }
@@ -117,22 +119,20 @@ static MCInstrAnalysis *createFARAInstrAnalysis(const MCInstrInfo *Info) {
 extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeFARATargetMC() {
   for (Target *T : {&getTheFARATarget()}) {
     TargetRegistry::RegisterMCAsmInfo(*T, createFARAMCAsmInfo);
-    //TargetRegistry::RegisterMCObjectFileInfo(*T, createFARAMCObjectFileInfo);
+    // TargetRegistry::RegisterMCObjectFileInfo(*T, createFARAMCObjectFileInfo);
     TargetRegistry::RegisterMCInstrInfo(*T, createFARAMCInstrInfo);
     TargetRegistry::RegisterMCRegInfo(*T, createFARAMCRegisterInfo);
-    //TargetRegistry::RegisterMCAsmBackend(*T, createFARAAsmBackend);
-    //TargetRegistry::RegisterMCCodeEmitter(*T, createFARAMCCodeEmitter);
-    //TargetRegistry::RegisterMCInstPrinter(*T, createFARAMCInstPrinter);
+    // TargetRegistry::RegisterMCAsmBackend(*T, createFARAAsmBackend);
+    // TargetRegistry::RegisterMCCodeEmitter(*T, createFARAMCCodeEmitter);
+    // TargetRegistry::RegisterMCInstPrinter(*T, createFARAMCInstPrinter);
     TargetRegistry::RegisterMCSubtargetInfo(*T, createFARAMCSubtargetInfo);
-    //TargetRegistry::RegisterELFStreamer(*T, createFARAELFStreamer);
+    // TargetRegistry::RegisterELFStreamer(*T, createFARAELFStreamer);
+    // TargetRegistry::RegisterMCInstrAnalysis(*T, createFARAInstrAnalysis);
+
     //TargetRegistry::RegisterObjectTargetStreamer(
     //    *T, createFARAObjectTargetStreamer);
-    //TargetRegistry::RegisterMCInstrAnalysis(*T, createFARAInstrAnalysis);
-
-    // Register the asm target streamer.
-    //TargetRegistry::RegisterAsmTargetStreamer(*T, createFARAAsmTargetStreamer);
-    // Register the null target streamer.
-    //TargetRegistry::RegisterNullTargetStreamer(*T,
-    //                                           createFARANullTargetStreamer);
+    TargetRegistry::RegisterAsmTargetStreamer(*T, createFARAAsmTargetStreamer);
+    TargetRegistry::RegisterNullTargetStreamer(*T,
+                                               createFARANullTargetStreamer);
   }
 }
