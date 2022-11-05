@@ -38,6 +38,7 @@ StringRef Triple::getArchTypeName(ArchType Kind) {
   case bpfel:          return "bpfel";
   case csky:           return "csky";
   case dxil:           return "dxil";
+  case fara:           return "fara";
   case hexagon:        return "hexagon";
   case hsail64:        return "hsail64";
   case hsail:          return "hsail";
@@ -520,6 +521,7 @@ static Triple::ArchType parseArch(StringRef ArchName) {
     .Case("loongarch64", Triple::loongarch64)
     .Case("dxil", Triple::dxil)
     .Case("xtensa", Triple::xtensa)
+    .Case("fara", Triple::fara)
     .Default(Triple::UnknownArch);
 
   // Some architectures require special parsing logic just to compute the
@@ -819,6 +821,7 @@ static Triple::ObjectFormatType getDefaultFormat(const Triple &T) {
   case Triple::bpfeb:
   case Triple::bpfel:
   case Triple::csky:
+  case Triple::fara:
   case Triple::hexagon:
   case Triple::hsail64:
   case Triple::hsail:
@@ -1444,6 +1447,7 @@ static unsigned getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
   case llvm::Triple::amdil64:
   case llvm::Triple::bpfeb:
   case llvm::Triple::bpfel:
+  case llvm::Triple::fara:
   case llvm::Triple::hsail64:
   case llvm::Triple::le64:
   case llvm::Triple::loongarch64:
@@ -1486,6 +1490,7 @@ Triple Triple::get32BitArchVariant() const {
   case Triple::avr:
   case Triple::bpfeb:
   case Triple::bpfel:
+  case Triple::fara:
   case Triple::msp430:
   case Triple::systemz:
   case Triple::ve:
@@ -1587,6 +1592,7 @@ Triple Triple::get64BitArchVariant() const {
   case Triple::amdil64:
   case Triple::bpfeb:
   case Triple::bpfel:
+  case Triple::fara:
   case Triple::hsail64:
   case Triple::le64:
   case Triple::loongarch64:

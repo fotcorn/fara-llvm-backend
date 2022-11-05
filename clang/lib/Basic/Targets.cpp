@@ -21,6 +21,7 @@
 #include "Targets/BPF.h"
 #include "Targets/CSKY.h"
 #include "Targets/DirectX.h"
+#include "Targets/FARA.h"
 #include "Targets/Hexagon.h"
 #include "Targets/Lanai.h"
 #include "Targets/Le64.h"
@@ -469,6 +470,14 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
       return new FreeBSDTargetInfo<SparcV9TargetInfo>(Triple, Opts);
     default:
       return new SparcV9TargetInfo(Triple, Opts);
+    }
+
+  case llvm::Triple::fara:
+    switch (os) {
+    case llvm::Triple::Linux:
+      return new LinuxTargetInfo<FARATargetInfo>(Triple, Opts);
+    default:
+      return new FARATargetInfo(Triple, Opts);
     }
 
   case llvm::Triple::systemz:
