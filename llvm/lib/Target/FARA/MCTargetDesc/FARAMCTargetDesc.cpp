@@ -122,7 +122,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeFARATargetMC() {
     // TargetRegistry::RegisterMCObjectFileInfo(*T, createFARAMCObjectFileInfo);
     TargetRegistry::RegisterMCInstrInfo(*T, createFARAMCInstrInfo);
     TargetRegistry::RegisterMCRegInfo(*T, createFARAMCRegisterInfo);
-    // TargetRegistry::RegisterMCAsmBackend(*T, createFARAAsmBackend);
+    TargetRegistry::RegisterMCAsmBackend(*T, createFARAAsmBackend);
     // TargetRegistry::RegisterMCCodeEmitter(*T, createFARAMCCodeEmitter);
     // TargetRegistry::RegisterMCInstPrinter(*T, createFARAMCInstPrinter);
     TargetRegistry::RegisterMCSubtargetInfo(*T, createFARAMCSubtargetInfo);
