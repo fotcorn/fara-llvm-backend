@@ -1,24 +1,12 @@
 include "FARAInstrFormats.td"
 
-def ADD8S : FARAInst<0x0101, 8,
-  (outs IntRegs:$dst),
-  (ins IntRegs:$src1, IntRegs:$src2),
-  "add8s $src1, $src2",
-  [(set i64:$dst, (add i64:$src1, i64:$src2))]>
-{
-  let Constraints = "$src2 = $dst";
-}
+def ADD8SReg : FARARegRegInst<0x0101, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
+def ADD8SImm : FARAImmRegInst<0x0101, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADDS : MnemonicAlias<"adds", "add8s">;
 def ADD : MnemonicAlias<"add", "add8s">;
 
-def SUB8S : FARAInst<0x0102, 8,
-  (outs IntRegs:$dst),
-  (ins IntRegs:$src1, IntRegs:$src2),
-  "sub8s $src1, $src2",
-  [(set i64:$dst, (sub i64:$src1, i64:$src2))]>
-{
-  let Constraints = "$src2 = $dst";
-}
+def SUB8SReg : FARARegRegInst<0x0102, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$src1, i64:$src2))]>;
+def SUB8SImm : FARAImmRegInst<0x0102, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$src1, i64:$src2))]>;
 def SUBS : MnemonicAlias<"subs", "sub8s">;
 def SUB : MnemonicAlias<"sub", "sub8s">;
 
