@@ -4,6 +4,7 @@ add_llvm_component_library(LLVMFARADesc
   FARATargetStreamer.cpp
   FARAAsmBackend.cpp
   FARAELFObjectWriter.cpp
+  FARAMCCodeEmitter.cpp
 
   LINK_COMPONENTS
   MC

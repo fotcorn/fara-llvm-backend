@@ -35,7 +35,10 @@ MCAsmBackend *createFARAAsmBackend(const Target &T, const MCSubtargetInfo &STI,
 
 // implemented in FARAELFObjectWriter.cpp
 std::unique_ptr<MCObjectTargetWriter> createFARAELFObjectWriter(uint8_t OSABI);
-}
+
+// implemented in FARAMCCodeEmitter.cpp
+MCCodeEmitter *createFARAMCCodeEmitter(const MCInstrInfo &MCII, MCContext &Ctx);
+} // namespace llvm
 
 // Defines symbolic names for FARA registers.
 #define GET_REGINFO_ENUM
