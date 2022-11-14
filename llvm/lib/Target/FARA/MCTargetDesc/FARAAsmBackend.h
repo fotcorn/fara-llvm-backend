@@ -9,14 +9,15 @@
 #ifndef LLVM_LIB_TARGET_FARA_MCTARGETDESC_FARAASMBACKEND_H
 #define LLVM_LIB_TARGET_FARA_MCTARGETDESC_FARAASMBACKEND_H
 
+#include "FARAMCTargetDesc.h"
 #include "llvm/MC/MCAsmBackend.h"
 #include "llvm/MC/MCSubtargetInfo.h"
-#include "FARAMCTargetDesc.h"
 
 namespace llvm {
 
 class FARAAsmBackend : public MCAsmBackend {
   uint8_t OSABI;
+
 public:
   FARAAsmBackend(uint8_t OSABI) : MCAsmBackend(support::little), OSABI(OSABI) {}
 
@@ -49,6 +50,9 @@ public:
 
   bool writeNopData(raw_ostream &OS, uint64_t Count,
                     const MCSubtargetInfo *STI) const override {
+    if (Count == 0) {
+      return true;
+    }
     return false;
   }
 };
