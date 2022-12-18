@@ -35,12 +35,9 @@ STATISTIC(MCNumEmitted, "Number of MC instructions emitted");
 namespace {
 
 class FARAMCCodeEmitter : public MCCodeEmitter {
-  // MCContext &Ctx;
-  // MCInstrInfo const &MCII;
 
 public:
-  FARAMCCodeEmitter(MCContext &ctx, MCInstrInfo const &MCII)
-      /*: Ctx(ctx), MCII(MCII)*/ {}
+  FARAMCCodeEmitter(MCContext &ctx, MCInstrInfo const &MCII) {}
   FARAMCCodeEmitter(const FARAMCCodeEmitter &) = delete;
   FARAMCCodeEmitter &operator=(const FARAMCCodeEmitter &) = delete;
   ~FARAMCCodeEmitter() override = default;
@@ -57,12 +54,25 @@ public:
 } // end anonymous namespace
 
 void FARAMCCodeEmitter::encodeInstruction(const MCInst &MI, raw_ostream &OS,
-                         SmallVectorImpl<MCFixup> &Fixups,
-                         const MCSubtargetInfo &STI) const {
-  uint64_t Bits = getBinaryCodeForInstr(MI, Fixups, STI);
-  support::endian::write<uint64_t>(OS, Bits, support::little);
+                                          SmallVectorImpl<MCFixup> &Fixups,
+                                          const MCSubtargetInfo &STI) const {
+  uint32_t Bits = getBinaryCodeForInstr(MI, Fixups, STI);
+  support::endian::write<uint32_t>(OS, Bits, support::little);
 
-  // TODO: implement writing out parameters to instructions
+  unsigned int i = 0;
+  if (MI.getNumOperands() == 3)
+    i = 1;
+
+  for (; i < MI.getNumOperands(); i++) {
+    const auto &operand = MI.getOperand(i);
+    if (operand.isImm()) {
+      int64_t imm = operand.getImm();
+      support::endian::write<int64_t>(OS, imm, support::big);
+    } else if (operand.isReg()) {
+      unsigned reg = operand.getReg();
+      support::endian::write<uint8_t>(OS, reg, support::little);
+    }
+  }
 
   ++MCNumEmitted; // Keep track of the # of mi's emitted.
 }
@@ -70,6 +80,6 @@ void FARAMCCodeEmitter::encodeInstruction(const MCInst &MI, raw_ostream &OS,
 #include "FARAGenMCCodeEmitter.inc"
 
 MCCodeEmitter *llvm::createFARAMCCodeEmitter(const MCInstrInfo &MCII,
-                                           MCContext &Ctx) {
+                                             MCContext &Ctx) {
   return new FARAMCCodeEmitter(Ctx, MCII);
 }
