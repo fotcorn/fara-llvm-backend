@@ -54,8 +54,9 @@ private:
                                OperandVector &Operands, MCStreamer &Out,
                                uint64_t &ErrorInfo,
                                bool MatchingInlineAsm) override;
-  bool ParseRegister(unsigned &RegNo, SMLoc &StartLoc, SMLoc &EndLoc) override;
-  OperandMatchResultTy tryParseRegister(unsigned &RegNo, SMLoc &StartLoc,
+  bool parseRegister(MCRegister &RegNo, SMLoc &StartLoc,
+                     SMLoc &EndLoc) override;
+  OperandMatchResultTy tryParseRegister(MCRegister &RegNo, SMLoc &StartLoc,
                                         SMLoc &EndLoc) override;
   bool ParseInstruction(ParseInstructionInfo &Info, StringRef Name,
                         SMLoc NameLoc, OperandVector &Operands) override;
@@ -183,14 +184,14 @@ public:
 #define GET_MATCHER_IMPLEMENTATION
 #include "FARAGenAsmMatcher.inc"
 
-bool FARAAsmParser::ParseRegister(unsigned &RegNo, SMLoc &StartLoc,
+bool FARAAsmParser::parseRegister(MCRegister &RegNo, SMLoc &StartLoc,
                                   SMLoc &EndLoc) {
   if (tryParseRegister(RegNo, StartLoc, EndLoc) != MatchOperand_Success)
     return Error(StartLoc, "invalid register name");
   return false;
 }
 
-OperandMatchResultTy FARAAsmParser::tryParseRegister(unsigned &RegNo,
+OperandMatchResultTy FARAAsmParser::tryParseRegister(MCRegister &RegNo,
                                                      SMLoc &StartLoc,
                                                      SMLoc &EndLoc) {
   const AsmToken Tok = Parser.getTok();
@@ -340,12 +341,12 @@ bool FARAAsmParser::parseOperand(OperandVector &Operands, StringRef Mnemonic) {
   default:
     break;
 
-  case AsmToken::Percent:
-    unsigned RegNo;
+  case AsmToken::Percent: {
+    MCRegister RegNo;
     if (tryParseRegister(RegNo, S, E) == MatchOperand_Success)
       Op = FARAOperand::createReg(RegNo, S, E);
     break;
-
+  }
   case AsmToken::Minus:
   case AsmToken::Integer:
   case AsmToken::Dot:
