@@ -1,17 +1,17 @@
 include "FARAInstrFormats.td"
 
 
-def ADD8SReg : FARARegRegInstArithmetic<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
-def ADD8SImm : FARAImmRegInstArithmetic<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
+def ADD8S_rr : ALU_rr<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
+def ADD8S_ir : ALU_ir<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADDS : MnemonicAlias<"adds", "add8s">;
 def ADD : MnemonicAlias<"add", "add8s">;
 
-def SUB8SReg : FARARegRegInstArithmetic<0x1, 0x2, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$src1, i64:$src2))]>;
-def SUB8SImm : FARAImmRegInstArithmetic<0x1, 0x2, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$src1, i64:$src2))]>;
+def SUB8S_rr : ALU_rr<0x1, 0x2, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$src1, i64:$src2))]>;
+def SUB8S_ir : ALU_ir<0x1, 0x2, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$src1, i64:$src2))]>;
 def SUBS : MnemonicAlias<"subs", "sub8s">;
 def SUB : MnemonicAlias<"sub", "sub8s">;
 
-def MOV8Reg : FARAInst<0x0, 0x1, 0x4,
+def MOV8_rr : FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
   (ins IntRegs:$src),
   "mov8 $src, $dst",
@@ -21,7 +21,7 @@ def MOV8Reg : FARAInst<0x0, 0x1, 0x4,
   let Inst{31-28} = 0x1; // register
 }
 
-def MOV8Imm : FARAInst<0x0, 0x1, 0x4,
+def MOV8_ir: FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
   (ins i64imm:$src),
   "mov8 $src, $dst",
@@ -48,7 +48,7 @@ def LD8 : FARAInst<0x0, 0x2, 0x4,
 def LD : MnemonicAlias<"ld", "ld8">;
 
 // todo: OUT is only valid for 1 byte for each parameter
-def OUT1Imm : FARAInst<0x6, 0x2, 0x4,
+def OUT1_ii : FARAInst<0x6, 0x2, 0x4,
   (outs),
   (ins i8imm:$descriptor, i8imm:$character),
   "out1 $descriptor, $character",
@@ -57,7 +57,7 @@ def OUT1Imm : FARAInst<0x6, 0x2, 0x4,
   let hasSideEffects = 1;
 }
 
-def OUT1Reg : FARAInst<0x6, 0x2, 0x4,
+def OUT1_ir : FARAInst<0x6, 0x2, 0x4,
   (outs),
   (ins i8imm:$descriptor, IntRegs:$character),
   "out1 $descriptor, $character",

@@ -21,14 +21,14 @@ class FARAInst<bits<8> optype, bits<8> opcode, bits<4> size, dag outs, dag ins, 
   let Pattern = pattern;
 }
 
-class FARARegRegInstArithmetic<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
+class ALU_rr<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
   : FARAInst<optype, opcode, 0x4, (outs IntRegs:$dst), (ins IntRegs:$src1, IntRegs:$src2), asmstr, pattern> {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
   let Constraints = "$src2 = $dst";
 }
 
-class FARAImmRegInstArithmetic<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
+class ALU_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
   : FARAInst<optype, opcode, 0x4, (outs IntRegs:$dst), (ins i64imm:$src1, IntRegs:$src2), asmstr, pattern> {
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
