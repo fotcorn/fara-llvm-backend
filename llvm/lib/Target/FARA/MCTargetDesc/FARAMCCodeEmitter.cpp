@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "FARABaseInfo.h"
 #include "FARAMCTargetDesc.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/Statistic.h"
@@ -35,9 +36,10 @@ STATISTIC(MCNumEmitted, "Number of MC instructions emitted");
 namespace {
 
 class FARAMCCodeEmitter : public MCCodeEmitter {
+  MCInstrInfo const &MCII;
 
 public:
-  FARAMCCodeEmitter(MCContext &ctx, MCInstrInfo const &MCII) {}
+  FARAMCCodeEmitter(MCContext &ctx, MCInstrInfo const &MCII) : MCII(MCII) {}
   FARAMCCodeEmitter(const FARAMCCodeEmitter &) = delete;
   FARAMCCodeEmitter &operator=(const FARAMCCodeEmitter &) = delete;
   ~FARAMCCodeEmitter() override = default;
@@ -59,8 +61,14 @@ void FARAMCCodeEmitter::encodeInstruction(const MCInst &MI, raw_ostream &OS,
   uint32_t Bits = getBinaryCodeForInstr(MI, Fixups, STI);
   support::endian::write<uint32_t>(OS, Bits, support::little);
 
+  const MCInstrDesc &Desc = MCII.get(MI.getOpcode());
+  unsigned int instFormat = FARA::getFormat(Desc.TSFlags);
+
+  // on ALU instructions, we get three operands: dst, src1, src2
+  // but dst and src2 are the same (see constraint on instruction definition),
+  // so we skip the first operand here (dst)
   unsigned int i = 0;
-  if (MI.getNumOperands() == 3)
+  if (instFormat == FARA::InstFormatALU)
     i = 1;
 
   for (; i < MI.getNumOperands(); i++) {
