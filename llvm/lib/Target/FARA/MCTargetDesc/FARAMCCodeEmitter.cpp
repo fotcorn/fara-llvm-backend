@@ -55,12 +55,15 @@ public:
 
 private:
   void encodeOperand(const unsigned int operandIndex, const MCInst &MI,
-                     const MCInstrDesc &Desc, raw_ostream &OS) const;
+                     const MCInstrDesc &Desc, SmallVectorImpl<MCFixup> &Fixups,
+                     uint64_t InstrStartPos, raw_ostream &OS) const;
 };
 } // end anonymous namespace
 
 void FARAMCCodeEmitter::encodeOperand(const unsigned int operandIndex,
                                       const MCInst &MI, const MCInstrDesc &Desc,
+                                      SmallVectorImpl<MCFixup> &Fixups,
+                                      uint64_t InstrStartPos,
                                       raw_ostream &OS) const {
   const MCOperand &operand = MI.getOperand(operandIndex);
   const MCOperandInfo &operandInfo = Desc.OpInfo[operandIndex];
@@ -79,33 +82,43 @@ void FARAMCCodeEmitter::encodeOperand(const unsigned int operandIndex,
     case FARA::OPERAND_I64IMM:
       support::endian::write<int64_t>(OS, imm, support::big);
       break;
+    default:
+      llvm_unreachable("invalid operand type");
     }
   } else if (operand.isReg()) {
     unsigned reg = operand.getReg();
     support::endian::write<uint8_t>(OS, reg, support::big);
+  } else if (operand.isExpr()) {
+    const MCExpr *expr = operand.getExpr();
+    Fixups.push_back(MCFixup::create(OS.tell() - InstrStartPos, expr, MCFixupKind::FK_PCRel_8));
+    support::endian::write<int64_t>(OS, 0, support::big);
   }
 }
 
 void FARAMCCodeEmitter::encodeInstruction(const MCInst &MI, raw_ostream &OS,
                                           SmallVectorImpl<MCFixup> &Fixups,
                                           const MCSubtargetInfo &STI) const {
+  uint64_t InstrStartPos = OS.tell();
   uint32_t Bits = getBinaryCodeForInstr(MI, Fixups, STI);
   support::endian::write<uint32_t>(OS, Bits, support::little);
 
-  if (MI.getNumOperands() > 0) {
+  if (MI.getNumOperands() == 1) {
+    const MCInstrDesc &Desc = MCII.get(MI.getOpcode());
+    encodeOperand(0, MI, Desc, Fixups, InstrStartPos, OS);
+  } else if (MI.getNumOperands() > 1) {
     const MCInstrDesc &Desc = MCII.get(MI.getOpcode());
     unsigned int instFormat = FARA::getFormat(Desc.TSFlags);
 
     // iterate over ins operands, assuimg there is only one outs/dst operand
     for (unsigned int i = 1; i < MI.getNumOperands(); i++) {
-      encodeOperand(i, MI, Desc, OS);
+      encodeOperand(i, MI, Desc, Fixups, InstrStartPos, OS);
     }
 
     // on ALU instructions, we get three operands in the list: dst, src1, src2
     // but dst and src2 are the same (see constraint on instruction definition),
     // so we do not output dst here if this is an ALU instruction.
     if (instFormat != FARA::InstFormatALU)
-      encodeOperand(0, MI, Desc, OS);
+      encodeOperand(0, MI, Desc, Fixups, InstrStartPos, OS);
   }
 
   ++MCNumEmitted; // Keep track of the # of mi's emitted.

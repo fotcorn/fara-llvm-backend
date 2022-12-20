@@ -1,5 +1,6 @@
 include "FARAInstrFormats.td"
 
+// arithmetic
 def ADD8S_rr : ALU_rr<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADD8S_ir : ALU_ir<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADDS : MnemonicAlias<"adds", "add8s">;
@@ -10,6 +11,7 @@ def SUB8S_ir : ALU_ir<0x1, 0x2, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$
 def SUBS : MnemonicAlias<"subs", "sub8s">;
 def SUB : MnemonicAlias<"sub", "sub8s">;
 
+// mov/memory
 def MOV8_rr : FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
   (ins IntRegs:$src),
@@ -46,6 +48,22 @@ def LD8 : FARAInst<0x0, 0x2, 0x4,
   [(set i64:$dst, i64:$src)]>;
 def LD : MnemonicAlias<"ld", "ld8">;
 
+// jumps/branch
+def JMP : FARAInst<0x3, 0x1, 0x4,
+  (outs),
+  (ins brtarget:$target),
+  "jmp $target",
+  [(br bb:$target)]>
+{
+  let Inst{19-16} = 0x5; // 8 byte immediate
+}
+
+defm JE8 : CondJump<0x3, 0x2, "je8 $op1, $op2, $target", [(brcond (i64 (setne i64:$op1, i64:$op2)), bb:$target)]>;
+def JE : MnemonicAlias<"je", "je8">;
+defm JNE8 : CondJump<0x3, 0x3, "jne8 $op1, $op2, $target", [(brcond (i64 (seteq i64:$op1, i64:$op2)), bb:$target)]>;
+def JNE : MnemonicAlias<"jne", "jne8">;
+
+// i/o
 def OUT1_ii : FARAInst<0x6, 0x2, 0x1,
   (outs),
   (ins i8imm_op:$descriptor, i8imm_op:$character),

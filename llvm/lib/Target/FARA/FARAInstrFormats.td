@@ -27,6 +27,10 @@ def i64imm_op : Operand<i64> {
   let OperandType = "OPERAND_I64IMM";
 }
 
+def brtarget : Operand<OtherVT> {
+  let OperandType = "OPERAND_PCREL";
+}
+
 // These definitions must be kept in-sync with FARABaseInfo.h.
 class InstFormat<bits<4> val> {
   bits<4> Value = val;
@@ -62,4 +66,26 @@ class ALU_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
   let Constraints = "$src2 = $dst";
+}
+
+class CondJump_rr<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
+  : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern> {
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x1; // register
+}
+class CondJump_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
+  : FARAInst<optype, opcode, 0x4, (outs), (ins i64imm_op:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern> {
+  let Inst{19-16} = 0x5; // 8 byte immediate
+  let Inst{31-28} = 0x1; // register
+}
+class CondJump_ri<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
+  : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, i64imm_op:$op2, brtarget:$target), asmstr, pattern> {
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x1; // register
+}
+
+multiclass CondJump<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern> {
+  def : CondJump_rr<optype, opcode, asmstr, pattern>;
+  def : CondJump_ir<optype, opcode, asmstr, pattern>;
+  def : CondJump_ri<optype, opcode, asmstr, pattern>;
 }
