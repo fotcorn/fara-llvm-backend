@@ -15,6 +15,7 @@
 
 #include "llvm/Config/config.h"
 #include "llvm/MC/MCTargetOptions.h"
+#include "llvm/MC/MCInstrDesc.h"
 #include "llvm/Support/DataTypes.h"
 #include <memory>
 
@@ -38,6 +39,19 @@ std::unique_ptr<MCObjectTargetWriter> createFARAELFObjectWriter(uint8_t OSABI);
 
 // implemented in FARAMCCodeEmitter.cpp
 MCCodeEmitter *createFARAMCCodeEmitter(const MCInstrInfo &MCII, MCContext &Ctx);
+
+namespace FARA {
+enum OperandType {
+  /// 8-bit integer immediates.
+  OPERAND_I8IMM = MCOI::OPERAND_FIRST_TARGET,
+  /// 16-bit integer immediates.
+  OPERAND_I16IMM,
+  /// 32-bit integer immediates.
+  OPERAND_I32IMM,
+  /// 64-bit integer immediates.
+  OPERAND_I64IMM,
+};
+}
 } // namespace llvm
 
 // Defines symbolic names for FARA registers.

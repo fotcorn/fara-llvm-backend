@@ -73,9 +73,23 @@ void FARAMCCodeEmitter::encodeInstruction(const MCInst &MI, raw_ostream &OS,
 
   for (; i < MI.getNumOperands(); i++) {
     const auto &operand = MI.getOperand(i);
+    const MCOperandInfo &operandInfo = Desc.OpInfo[i];
     if (operand.isImm()) {
       int64_t imm = operand.getImm();
-      support::endian::write<int64_t>(OS, imm, support::big);
+      switch (operandInfo.OperandType) {
+        case FARA::OPERAND_I8IMM:
+          support::endian::write<int8_t>(OS, imm, support::big);
+          break;
+        case FARA::OPERAND_I16IMM:
+          support::endian::write<int16_t>(OS, imm, support::big);
+          break;
+        case FARA::OPERAND_I32IMM:
+          support::endian::write<int32_t>(OS, imm, support::big);
+          break;
+        case FARA::OPERAND_I64IMM:
+          support::endian::write<int64_t>(OS, imm, support::big);
+          break;
+      }
     } else if (operand.isReg()) {
       unsigned reg = operand.getReg();
       support::endian::write<uint8_t>(OS, reg, support::little);

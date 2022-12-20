@@ -7,6 +7,26 @@ Inst{27-24} = operand3
 Inst{31-28} = operand2
 */
 
+def i8imm_op : Operand<i8> {
+  let OperandNamespace = "FARA";
+  let OperandType = "OPERAND_I8IMM";
+}
+
+def i16imm_op : Operand<i16> {
+  let OperandNamespace = "FARA";
+  let OperandType = "OPERAND_I16IMM";
+}
+
+def i32imm_op : Operand<i32> {
+  let OperandNamespace = "FARA";
+  let OperandType = "OPERAND_I32IMM";
+}
+
+def i64imm_op : Operand<i64> {
+  let OperandNamespace = "FARA";
+  let OperandType = "OPERAND_I64IMM";
+}
+
 // These definitions must be kept in-sync with FARABaseInfo.h.
 class InstFormat<bits<4> val> {
   bits<4> Value = val;
@@ -38,7 +58,7 @@ class ALU_rr<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
 }
 
 class ALU_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs IntRegs:$dst), (ins i64imm:$src1, IntRegs:$src2), asmstr, pattern, InstFormatALU> {
+  : FARAInst<optype, opcode, 0x4, (outs IntRegs:$dst), (ins i64imm_op:$src1, IntRegs:$src2), asmstr, pattern, InstFormatALU> {
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
   let Constraints = "$src2 = $dst";

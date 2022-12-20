@@ -1,6 +1,5 @@
 include "FARAInstrFormats.td"
 
-
 def ADD8S_rr : ALU_rr<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADD8S_ir : ALU_ir<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADDS : MnemonicAlias<"adds", "add8s">;
@@ -23,7 +22,7 @@ def MOV8_rr : FARAInst<0x0, 0x1, 0x4,
 
 def MOV8_ir: FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
-  (ins i64imm:$src),
+  (ins i64imm_op:$src),
   "mov8 $src, $dst",
   [(set i64:$dst, i64:$src)]>
 {
@@ -34,36 +33,39 @@ def MOV8_ir: FARAInst<0x0, 0x1, 0x4,
 def MOV : MnemonicAlias<"mov", "mov8">;
 
 def STR8 : FARAInst<0x0, 0x3, 0x4,
-  (outs i64imm:$dst),
+  (outs i64imm_op:$dst),
   (ins IntRegs:$src),
   "str8 $src, $dst",
   [(set i64:$dst, i64:$src)]>;
 def STR : MnemonicAlias<"str", "str8">;
 
 def LD8 : FARAInst<0x0, 0x2, 0x4,
-  (outs i64imm:$dst),
+  (outs i64imm_op:$dst),
   (ins IntRegs:$src),
   "ld8 $src, $dst",
   [(set i64:$dst, i64:$src)]>;
 def LD : MnemonicAlias<"ld", "ld8">;
 
-// todo: OUT is only valid for 1 byte for each parameter
-def OUT1_ii : FARAInst<0x6, 0x2, 0x4,
+def OUT1_ii : FARAInst<0x6, 0x2, 0x1,
   (outs),
-  (ins i8imm:$descriptor, i8imm:$character),
+  (ins i8imm_op:$descriptor, i8imm_op:$character),
   "out1 $descriptor, $character",
   []>
 {
   let hasSideEffects = 1;
+  let Inst{19-16} = 0x2; // 1 byte immediate
+  let Inst{31-28} = 0x2; // 1 byte immediate
 }
 
-def OUT1_ir : FARAInst<0x6, 0x2, 0x4,
+def OUT1_ir : FARAInst<0x6, 0x2, 0x1,
   (outs),
-  (ins i8imm:$descriptor, IntRegs:$character),
+  (ins i8imm_op:$descriptor, IntRegs:$character),
   "out1 $descriptor, $character",
   []>
 {
   let hasSideEffects = 1;
+  let Inst{19-16} = 0x2; // 1 byte immediate
+  let Inst{31-28} = 0x1; // register
 }
 def OUT : MnemonicAlias<"out", "out1">;
 
