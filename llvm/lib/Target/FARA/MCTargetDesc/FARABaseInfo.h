@@ -19,8 +19,10 @@ namespace llvm {
 
 namespace FARA {
 enum {
-  InstFormatDefault = 0,
-  InstFormatALU = 1,
+  // see FARAInstrFormats.td for documentation for the following entries
+  InstFormatNoOut = 0,
+  InstFormatOneOut = 1,
+  InstFormatOneOutIgnore = 2,
 
   InstFormatMask = 15, // inst format is 4bits
   InstFormatShift = 0,

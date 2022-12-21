@@ -16,7 +16,8 @@ def MOV8_rr : FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
   (ins IntRegs:$src),
   "mov8 $src, $dst",
-  [(set i64:$dst, i64:$src)]>
+  [(set i64:$dst, i64:$src)],
+  InstFormatOneOut>
 {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
@@ -26,7 +27,8 @@ def MOV8_ir: FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
   (ins i64imm_op:$src),
   "mov8 $src, $dst",
-  [(set i64:$dst, i64:$src)]>
+  [(set i64:$dst, i64:$src)],
+  InstFormatOneOut>
 {
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
@@ -34,18 +36,20 @@ def MOV8_ir: FARAInst<0x0, 0x1, 0x4,
 
 def MOV : MnemonicAlias<"mov", "mov8">;
 
-def STR8 : FARAInst<0x0, 0x3, 0x4,
+def STR8 : FARAInst<0x0, 0x3, 0x4, // todo add isStore flag
   (outs i64imm_op:$dst),
   (ins IntRegs:$src),
   "str8 $src, $dst",
-  [(set i64:$dst, i64:$src)]>;
+  [(set i64:$dst, i64:$src)], // todo: fix Pattern
+  InstFormatOneOut>; // todo: implement encoding
 def STR : MnemonicAlias<"str", "str8">;
 
-def LD8 : FARAInst<0x0, 0x2, 0x4,
+def LD8 : FARAInst<0x0, 0x2, 0x4, // todo add isLoad flag
   (outs i64imm_op:$dst),
   (ins IntRegs:$src),
   "ld8 $src, $dst",
-  [(set i64:$dst, i64:$src)]>;
+  [(set i64:$dst, i64:$src)], // todo: fix Pattern
+  InstFormatOneOut>; // todo: implement encoding
 def LD : MnemonicAlias<"ld", "ld8">;
 
 // jumps/branch
@@ -53,7 +57,8 @@ def JMP : FARAInst<0x3, 0x1, 0x4,
   (outs),
   (ins brtarget:$target),
   "jmp $target",
-  [(br bb:$target)]>
+  [(br bb:$target)],
+  InstFormatNoOut>
 {
   let Inst{19-16} = 0x5; // 8 byte immediate
 }
@@ -68,7 +73,8 @@ def OUT1_ii : FARAInst<0x6, 0x2, 0x1,
   (outs),
   (ins i8imm_op:$descriptor, i8imm_op:$character),
   "out1 $descriptor, $character",
-  []>
+  [],
+  InstFormatNoOut>
 {
   let hasSideEffects = 1;
   let Inst{19-16} = 0x2; // 1 byte immediate
@@ -79,7 +85,8 @@ def OUT1_ir : FARAInst<0x6, 0x2, 0x1,
   (outs),
   (ins i8imm_op:$descriptor, IntRegs:$character),
   "out1 $descriptor, $character",
-  []>
+  [],
+  InstFormatNoOut>
 {
   let hasSideEffects = 1;
   let Inst{19-16} = 0x2; // 1 byte immediate
@@ -92,7 +99,8 @@ def HALT : FARAInst<0x8, 0x1, 0x4,
   (outs),
   (ins),
   "halt",
-  []>
+  [],
+  InstFormatNoOut>
 {
   let hasSideEffects = 1;
 }

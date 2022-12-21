@@ -90,7 +90,8 @@ void FARAMCCodeEmitter::encodeOperand(const unsigned int operandIndex,
     support::endian::write<uint8_t>(OS, reg, support::big);
   } else if (operand.isExpr()) {
     const MCExpr *expr = operand.getExpr();
-    Fixups.push_back(MCFixup::create(OS.tell() - InstrStartPos, expr, MCFixupKind::FK_PCRel_8));
+    Fixups.push_back(MCFixup::create(OS.tell() - InstrStartPos, expr,
+                                     MCFixupKind::FK_PCRel_8));
     support::endian::write<int64_t>(OS, 0, support::big);
   }
 }
@@ -102,24 +103,26 @@ void FARAMCCodeEmitter::encodeInstruction(const MCInst &MI, raw_ostream &OS,
   uint32_t Bits = getBinaryCodeForInstr(MI, Fixups, STI);
   support::endian::write<uint32_t>(OS, Bits, support::little);
 
-  if (MI.getNumOperands() == 1) {
-    const MCInstrDesc &Desc = MCII.get(MI.getOpcode());
-    encodeOperand(0, MI, Desc, Fixups, InstrStartPos, OS);
-  } else if (MI.getNumOperands() > 1) {
-    const MCInstrDesc &Desc = MCII.get(MI.getOpcode());
-    unsigned int instFormat = FARA::getFormat(Desc.TSFlags);
+  const MCInstrDesc &Desc = MCII.get(MI.getOpcode());
+  unsigned int instFormat = FARA::getFormat(Desc.TSFlags);
 
-    // iterate over ins operands, assuimg there is only one outs/dst operand
-    for (unsigned int i = 1; i < MI.getNumOperands(); i++) {
-      encodeOperand(i, MI, Desc, Fixups, InstrStartPos, OS);
-    }
-
-    // on ALU instructions, we get three operands in the list: dst, src1, src2
-    // but dst and src2 are the same (see constraint on instruction definition),
-    // so we do not output dst here if this is an ALU instruction.
-    if (instFormat != FARA::InstFormatALU)
-      encodeOperand(0, MI, Desc, Fixups, InstrStartPos, OS);
+  // the list of operands contains the out operands first, then the ins operands
+  // in machine code, we serialize ins first, then outs, so we have to invert
+  // the order depending on the instruction format.
+  // * InstFormatNoOut: We don't have any outs, so just start at index 0 with
+  // the first ins
+  // * InstFormatOneOut: One outs, so start with index 1, and output out after
+  // the iteration
+  // * InstFormatOneOutIgnore: Also one outs, start at index 1, but then don't
+  // output outs
+  unsigned int I = instFormat == FARA::InstFormatNoOut ? 0 : 1;
+  // iterate over ins operands
+  for (; I < MI.getNumOperands(); I++) {
+    encodeOperand(I, MI, Desc, Fixups, InstrStartPos, OS);
   }
+
+  if (instFormat == FARA::InstFormatOneOut)
+    encodeOperand(0, MI, Desc, Fixups, InstrStartPos, OS);
 
   ++MCNumEmitted; // Keep track of the # of mi's emitted.
 }

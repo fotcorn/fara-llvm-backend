@@ -35,10 +35,13 @@ def brtarget : Operand<OtherVT> {
 class InstFormat<bits<4> val> {
   bits<4> Value = val;
 }
-def InstFormatDefault : InstFormat<0>;
-def InstFormatALU : InstFormat<1>; // src2 operand is also dst
+def InstFormatNoOut : InstFormat<0>; // instruction has no out operands
+def InstFormatOneOut : InstFormat<1>; // instruction has one out operand
+// instruction has one out operand, but it is not serialized
+// because output is the same as the last output. mostly used in ALU ops like add/sub
+def InstFormatOneOutIgnore : InstFormat<2>;
 
-class FARAInst<bits<8> optype, bits<8> opcode, bits<4> size, dag outs, dag ins, string asmstr, list<dag> pattern, InstFormat format=InstFormatDefault>
+class FARAInst<bits<8> optype, bits<8> opcode, bits<4> size, dag outs, dag ins, string asmstr, list<dag> pattern, InstFormat format>
   : Instruction {
   field bits<32> Inst;
   let Inst{7-0} = optype;
@@ -55,31 +58,31 @@ class FARAInst<bits<8> optype, bits<8> opcode, bits<4> size, dag outs, dag ins, 
 }
 
 class ALU_rr<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs IntRegs:$dst), (ins IntRegs:$src1, IntRegs:$src2), asmstr, pattern, InstFormatALU> {
+  : FARAInst<optype, opcode, 0x4, (outs IntRegs:$dst), (ins IntRegs:$src1, IntRegs:$src2), asmstr, pattern, InstFormatOneOutIgnore> {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
   let Constraints = "$src2 = $dst";
 }
 
 class ALU_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs IntRegs:$dst), (ins i64imm_op:$src1, IntRegs:$src2), asmstr, pattern, InstFormatALU> {
+  : FARAInst<optype, opcode, 0x4, (outs IntRegs:$dst), (ins i64imm_op:$src1, IntRegs:$src2), asmstr, pattern, InstFormatOneOutIgnore> {
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
   let Constraints = "$src2 = $dst";
 }
 
 class CondJump_rr<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern> {
+  : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern, InstFormatNoOut> {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
 }
 class CondJump_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs), (ins i64imm_op:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern> {
+  : FARAInst<optype, opcode, 0x4, (outs), (ins i64imm_op:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern, InstFormatNoOut> {
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
 }
 class CondJump_ri<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, i64imm_op:$op2, brtarget:$target), asmstr, pattern> {
+  : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, i64imm_op:$op2, brtarget:$target), asmstr, pattern, InstFormatNoOut> {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
 }
