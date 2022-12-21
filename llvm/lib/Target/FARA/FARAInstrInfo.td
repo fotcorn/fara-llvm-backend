@@ -60,7 +60,7 @@ def JMP : FARAInst<0x3, 0x1, 0x4,
   [(br bb:$target)],
   InstFormatNoOut>
 {
-  let Inst{19-16} = 0x5; // 8 byte immediate
+  let Inst{19-16} = 0x5; // 8 byte branch target
 }
 
 defm JE8 : CondJump<0x3, 0x2, "je8 $op1, $op2, $target", [(brcond (i64 (setne i64:$op1, i64:$op2)), bb:$target)]>;
