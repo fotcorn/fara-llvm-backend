@@ -21,6 +21,7 @@ def MOV8_rr : FARAInst<0x0, 0x1, 0x4,
 {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
+  let isMoveImm = true;
 }
 
 def MOV8_ir: FARAInst<0x0, 0x1, 0x4,
@@ -32,24 +33,34 @@ def MOV8_ir: FARAInst<0x0, 0x1, 0x4,
 {
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
+  let isMoveReg = true;
 }
-
 def MOV : MnemonicAlias<"mov", "mov8">;
 
-def STR8 : FARAInst<0x0, 0x3, 0x4, // todo add isStore flag
-  (outs i64imm_op:$dst),
-  (ins IntRegs:$src),
-  "str8 $src, $dst",
-  [(set i64:$dst, i64:$src)], // todo: fix Pattern
-  InstFormatOneOut>; // todo: implement encoding
+def STR8_rr : FARAInst<0x0, 0x3, 0x4,
+  (outs),
+  (ins IntRegs:$data, IntRegs:$address),
+  "str8 $data, $address",
+  [(store i64:$address, i64:$data)],
+  InstFormatNoOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x1; // register
+  let mayStore = true;
+}
 def STR : MnemonicAlias<"str", "str8">;
 
-def LD8 : FARAInst<0x0, 0x2, 0x4, // todo add isLoad flag
-  (outs i64imm_op:$dst),
-  (ins IntRegs:$src),
-  "ld8 $src, $dst",
-  [(set i64:$dst, i64:$src)], // todo: fix Pattern
-  InstFormatOneOut>; // todo: implement encoding
+def LD8_rr : FARAInst<0x0, 0x2, 0x4,
+  (outs IntRegs:$target),
+  (ins IntRegs:$address),
+  "ld8 $address, $target",
+  [(set i64:$target, (load i64:$address))],
+  InstFormatOneOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x1; // register
+  let mayLoad = true;
+}
 def LD : MnemonicAlias<"ld", "ld8">;
 
 // jumps/branch
