@@ -11,18 +11,18 @@ class FARATargetMachine : public LLVMTargetMachine {
 
 public:
   FARATargetMachine(const Target &T, const Triple &TT, StringRef CPU,
-                       StringRef FS, const TargetOptions &Options,
-                       std::optional<Reloc::Model> RM, std::optional<CodeModel::Model> CM,
-                       CodeGenOpt::Level OL, bool JIT);
+                    StringRef FS, const TargetOptions &Options,
+                    std::optional<Reloc::Model> RM,
+                    std::optional<CodeModel::Model> CM, CodeGenOpt::Level OL,
+                    bool JIT);
 
   const FARASubtarget *getSubtargetImpl() const { return &Subtarget; }
   const FARASubtarget *getSubtargetImpl(const Function &) const override {
     return &Subtarget;
   }
 
-  /*
   TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
-
+  /*
   TargetTransformInfo getTargetTransformInfo(const Function &F) override;
 
   TargetLoweringObjectFile *getObjFileLowering() const override {
