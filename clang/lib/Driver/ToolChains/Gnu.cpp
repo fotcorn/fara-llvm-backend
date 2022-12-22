@@ -2900,6 +2900,7 @@ bool Generic_GCC::IsIntegratedAssemblerDefault() const {
   case llvm::Triple::bpfel:
   case llvm::Triple::bpfeb:
   case llvm::Triple::csky:
+  case llvm::Triple::fara:
   case llvm::Triple::hexagon:
   case llvm::Triple::lanai:
   case llvm::Triple::loongarch32:
