@@ -12,6 +12,7 @@
 #include "FARATargetMachine.h"
 #include "FARA.h"
 #include "TargetInfo/FARATargetInfo.h"
+#include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
 #include "llvm/CodeGen/TargetPassConfig.h"
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/Target/TargetMachine.h"
@@ -48,6 +49,17 @@ static Reloc::Model getEffectiveRelocModel(std::optional<Reloc::Model> RM) {
   return RM.value_or(Reloc::Static);
 }
 
+class FARAELFTargetObjectFile : public TargetLoweringObjectFileELF {
+  void Initialize(MCContext &Ctx, const TargetMachine &TM) override {
+    TargetLoweringObjectFileELF::Initialize(Ctx, TM);
+    InitializeELF(TM.Options.UseInitArray);
+  }
+};
+
+static std::unique_ptr<TargetLoweringObjectFile> createTLOF() {
+  return std::make_unique<FARAELFTargetObjectFile>();
+}
+
 FARATargetMachine::FARATargetMachine(const Target &T, const Triple &TT,
                                      StringRef CPU, StringRef FS,
                                      const TargetOptions &Options,
@@ -57,6 +69,7 @@ FARATargetMachine::FARATargetMachine(const Target &T, const Triple &TT,
     : LLVMTargetMachine(T, computeDataLayout(), TT, CPU, FS, Options,
                         getEffectiveRelocModel(RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
+      TLOF(createTLOF()),
       Subtarget(TT, std::string(CPU), std::string(FS), *this) {
   initAsmInfo();
 }
