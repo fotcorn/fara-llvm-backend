@@ -19,6 +19,8 @@ add_llvm_target(FARACodeGen
   FARATargetMachine.cpp
   FARAInstrInfo.cpp
   FARAISelDAGToDAG.cpp
+  FARAMCInstLower.cpp
+  FARAAsmPrinter.cpp
 
   LINK_COMPONENTS
   Analysis

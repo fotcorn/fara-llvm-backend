@@ -20,7 +20,12 @@
 namespace llvm {
 class FunctionPass;
 class FARATargetMachine;
+class MachineInstr;
+class MCInst;
+class AsmPrinter;
 
 FunctionPass *createFARAISelDag(FARATargetMachine &TM);
+void lowerFARAMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
+                                   AsmPrinter &AP);
 } // end namespace llvm
 #endif
