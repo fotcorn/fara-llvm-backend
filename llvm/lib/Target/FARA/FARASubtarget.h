@@ -17,8 +17,8 @@
 // #include "FARAFrameLowering.h"
 // #include "FARAISelLowering.h"
 #include "FARAInstrInfo.h"
-// #include "FARASelectionDAGInfo.h"
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
+#include "llvm/CodeGen/SelectionDAGTargetInfo.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/Target/TargetMachine.h"
 #include <string>
@@ -34,7 +34,7 @@ class FARASubtarget : public FARAGenSubtargetInfo {
   FARAInstrInfo InstrInfo;
   //   FARAFrameLowering FrameLowering;
   //   FARATargetLowering TLInfo;
-  //SelectionDAGTargetInfo TSInfo;
+  SelectionDAGTargetInfo TSInfo;
 
 public:
   /// This constructor initializes the data members to match that
@@ -59,9 +59,10 @@ public:
     return nullptr;
     // return &TLInfo;
   }
-  const FARASelectionDAGInfo *getSelectionDAGInfo() const override {
+  */
+  const SelectionDAGTargetInfo *getSelectionDAGInfo() const override {
     return &TSInfo;
-  }*/
+  }
   /*const TargetRegisterInfo *getRegisterInfo() const override {
     return &InstrInfo.getRegisterInfo();
   }*/
