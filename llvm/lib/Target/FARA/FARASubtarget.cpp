@@ -29,5 +29,5 @@ void FARASubtarget::anchor() {}
 FARASubtarget::FARASubtarget(const Triple &TT, const std::string &CPU,
                                    const std::string &FS,
                                    const TargetMachine &TM)
-    : FARAGenSubtargetInfo(TT, CPU, /*TuneCPU=*/CPU, FS), InstrInfo(*this)
+    : FARAGenSubtargetInfo(TT, CPU, /*TuneCPU=*/CPU, FS), InstrInfo(*this), TLInfo(TM, *this)
 {}
