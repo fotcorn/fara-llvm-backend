@@ -14,7 +14,6 @@
 
 #include "FARASubtarget.h"
 #include "llvm/Support/MathExtras.h"
-//#include "llvm/Support/TargetRegistry.h"
 
 using namespace llvm;
 
@@ -27,7 +26,6 @@ using namespace llvm;
 void FARASubtarget::anchor() {}
 
 FARASubtarget::FARASubtarget(const Triple &TT, const std::string &CPU,
-                                   const std::string &FS,
-                                   const TargetMachine &TM)
-    : FARAGenSubtargetInfo(TT, CPU, /*TuneCPU=*/CPU, FS), InstrInfo(*this), TLInfo(TM, *this)
-{}
+                             const std::string &FS, const TargetMachine &TM)
+    : FARAGenSubtargetInfo(TT, CPU, /*TuneCPU=*/CPU, FS), InstrInfo(*this),
+      FrameLowering(*this), TLInfo(TM, *this) {}

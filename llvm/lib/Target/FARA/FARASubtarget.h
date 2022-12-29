@@ -1,5 +1,4 @@
-//===-- FARASubtarget.h - Define Subtarget for the FARA -------*- C++
-//-*-===//
+//===-- FARASubtarget.h - Define Subtarget for the FARA ---------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -17,6 +16,7 @@
 // #include "FARAFrameLowering.h"
 #include "FARAISelLowering.h"
 #include "FARAInstrInfo.h"
+#include "FARAFrameLowering.h"
 #include "llvm/CodeGen/SelectionDAGTargetInfo.h"
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
 #include "llvm/IR/DataLayout.h"
@@ -32,7 +32,7 @@ class StringRef;
 class FARASubtarget : public FARAGenSubtargetInfo {
   virtual void anchor();
   FARAInstrInfo InstrInfo;
-  //   FARAFrameLowering FrameLowering;
+  FARAFrameLowering FrameLowering;
   FARATargetLowering TLInfo;
   SelectionDAGTargetInfo TSInfo;
 
@@ -47,12 +47,9 @@ public:
   void ParseSubtargetFeatures(StringRef CPU, StringRef TuneCPU, StringRef FS);
 
   const FARAInstrInfo *getInstrInfo() const override { return &InstrInfo; }
-  /*
   const FARAFrameLowering *getFrameLowering() const override {
-    return nullptr;
-    // return &FrameLowering;
+    return &FrameLowering;
   }
-  */
   const FARATargetLowering *getTargetLowering() const override {
     return &TLInfo;
   }
