@@ -37,9 +37,10 @@ namespace {
 
 class FARAMCCodeEmitter : public MCCodeEmitter {
   MCInstrInfo const &MCII;
+  MCContext &Ctx;
 
 public:
-  FARAMCCodeEmitter(MCContext &ctx, MCInstrInfo const &MCII) : MCII(MCII) {}
+  FARAMCCodeEmitter(MCContext &ctx, MCInstrInfo const &MCII) : MCII(MCII), Ctx(ctx) {}
   FARAMCCodeEmitter(const FARAMCCodeEmitter &) = delete;
   FARAMCCodeEmitter &operator=(const FARAMCCodeEmitter &) = delete;
   ~FARAMCCodeEmitter() override = default;
@@ -86,7 +87,7 @@ void FARAMCCodeEmitter::encodeOperand(const unsigned int operandIndex,
       llvm_unreachable("invalid operand type");
     }
   } else if (operand.isReg()) {
-    unsigned reg = operand.getReg();
+    uint16_t reg = Ctx.getRegisterInfo()->getEncodingValue(operand.getReg());
     support::endian::write<uint8_t>(OS, reg, support::big);
   } else if (operand.isExpr()) {
     const MCExpr *expr = operand.getExpr();

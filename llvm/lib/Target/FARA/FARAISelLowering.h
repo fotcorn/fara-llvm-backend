@@ -21,8 +21,6 @@ namespace llvm {
 class FARASubtarget;
 
 class FARATargetLowering : public TargetLowering {
-  const FARASubtarget &Subtarget;
-
 public:
   explicit FARATargetLowering(const TargetMachine &TM,
                               const FARASubtarget &STI);

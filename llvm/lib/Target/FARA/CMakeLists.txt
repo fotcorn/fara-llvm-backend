@@ -23,6 +23,7 @@ add_llvm_target(FARACodeGen
   FARAAsmPrinter.cpp
   FARAISelLowering.cpp
   FARAFrameLowering.cpp
+  FARARegisterInfo.cpp
 
   LINK_COMPONENTS
   Analysis

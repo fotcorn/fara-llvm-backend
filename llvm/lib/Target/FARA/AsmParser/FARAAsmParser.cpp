@@ -181,6 +181,7 @@ public:
   }
 };
 
+#define GET_REGISTER_MATCHER
 #define GET_MATCHER_IMPLEMENTATION
 #include "FARAGenAsmMatcher.inc"
 
@@ -203,35 +204,9 @@ OperandMatchResultTy FARAAsmParser::tryParseRegister(MCRegister &RegNo,
   Parser.Lex();
 
   StringRef RegisterName = Parser.getTok().getString();
-  if (RegisterName.size() != 2 || RegisterName[0] != 'i')
-    return MatchOperand_NoMatch;
+  
+  RegNo = MatchRegisterName(RegisterName);
 
-  switch (RegisterName[1]) {
-  case '0':
-    RegNo = 1;
-    break;
-  case '1':
-    RegNo = 2;
-    break;
-  case '2':
-    RegNo = 3;
-    break;
-  case '3':
-    RegNo = 4;
-    break;
-  case '4':
-    RegNo = 5;
-    break;
-  case '5':
-    RegNo = 6;
-    break;
-  case '6':
-    RegNo = 7;
-    break;
-  case '7':
-    RegNo = 8;
-    break;
-  }
   if (RegNo != 0) {
     Parser.Lex();
     return MatchOperand_Success;

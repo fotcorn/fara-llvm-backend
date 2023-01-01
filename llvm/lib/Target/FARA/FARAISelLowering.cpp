@@ -20,4 +20,4 @@ using namespace llvm;
 
 FARATargetLowering::FARATargetLowering(const TargetMachine &TM,
                                        const FARASubtarget &STI)
-    : TargetLowering(TM), Subtarget(STI) {}
+    : TargetLowering(TM) {}

@@ -13,3 +13,5 @@ def RetCC_FARA : CallingConv<[
 
   CCIfType<[i64], CCAssignToReg<[I0, I1, I2, I3, I4, I5, I6, I7]>>,
 ]>;
+
+def CSR : CalleeSavedRegs<(add (sequence "I%u", 16, 23))>;

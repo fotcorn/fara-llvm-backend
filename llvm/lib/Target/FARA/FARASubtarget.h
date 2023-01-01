@@ -17,6 +17,7 @@
 #include "FARAISelLowering.h"
 #include "FARAInstrInfo.h"
 #include "FARAFrameLowering.h"
+#include "FARARegisterInfo.h"
 #include "llvm/CodeGen/SelectionDAGTargetInfo.h"
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
 #include "llvm/IR/DataLayout.h"
@@ -34,6 +35,7 @@ class FARASubtarget : public FARAGenSubtargetInfo {
   FARAInstrInfo InstrInfo;
   FARAFrameLowering FrameLowering;
   FARATargetLowering TLInfo;
+  FARARegisterInfo RegInfo;
   SelectionDAGTargetInfo TSInfo;
 
 public:
@@ -56,9 +58,9 @@ public:
   const SelectionDAGTargetInfo *getSelectionDAGInfo() const override {
     return &TSInfo;
   }
-  /*const TargetRegisterInfo *getRegisterInfo() const override {
-    return &InstrInfo.getRegisterInfo();
-  }*/
+  const FARARegisterInfo *getRegisterInfo() const override {
+    return &RegInfo;
+  }
 };
 } // namespace llvm
 
