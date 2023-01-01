@@ -4,11 +4,13 @@ include "FARAInstrFormats.td"
 def ADD8S_rr : ALU_rr<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADD8S_ir : ALU_ir<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADDS : MnemonicAlias<"adds", "add8s">;
+def ADD8 : MnemonicAlias<"add8", "add8s">;
 def ADD : MnemonicAlias<"add", "add8s">;
 
 def SUB8S_rr : ALU_rr<0x1, 0x2, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$src1, i64:$src2))]>;
 def SUB8S_ir : ALU_ir<0x1, 0x2, "sub8s $src1, $src2", [(set i64:$dst, (sub i64:$src1, i64:$src2))]>;
 def SUBS : MnemonicAlias<"subs", "sub8s">;
+def SUB8 : MnemonicAlias<"sub8", "sub8s">;
 def SUB : MnemonicAlias<"sub", "sub8s">;
 
 // mov/memory
