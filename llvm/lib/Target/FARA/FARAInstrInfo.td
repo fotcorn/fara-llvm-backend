@@ -142,8 +142,7 @@ def OUT1_ir : FARAInst<0x6, 0x2, 0x1,
 }
 def OUT : MnemonicAlias<"out", "out1">;
 
-// todo: we don't support size 0 yet in the emulator, writing as 8 for now
-def HALT : FARAInst<0x8, 0x1, 0x4,
+def HALT : FARAInst<0x8, 0x1, 0x0,
   (outs),
   (ins),
   "halt",
