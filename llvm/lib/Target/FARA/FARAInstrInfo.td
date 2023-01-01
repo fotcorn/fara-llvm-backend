@@ -118,6 +118,27 @@ def POP8_r : FARAInst<0x5, 0x2, 0x4,
 }
 def POP : MnemonicAlias<"pop", "pop8">;
 
+def RET : FARAInst<0x5, 0x4, 0x0,
+  (outs),
+  (ins),
+  "ret",
+  [],
+  InstFormatNoOut>
+{
+  let isReturn = 1;
+}
+
+def CALL : FARAInst<0x5, 0x3, 0x0,
+  (outs),
+  (ins brtarget:$target),
+  "call $target",
+  [],
+  InstFormatNoOut>
+{
+  let Inst{19-16} = 0x5; // 8 byte branch target
+  let isCall = 1;
+}
+
 // jumps/branch
 def JMP : FARAInst<0x3, 0x1, 0x4,
   (outs),
