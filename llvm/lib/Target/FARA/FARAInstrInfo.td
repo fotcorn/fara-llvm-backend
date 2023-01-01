@@ -13,17 +13,23 @@ def SUBS : MnemonicAlias<"subs", "sub8s">;
 def SUB8 : MnemonicAlias<"sub8", "sub8s">;
 def SUB : MnemonicAlias<"sub", "sub8s">;
 
-def MUL8S_rr : ALU_rr<0x1, 0x2, "mul8s $src1, $src2", [(set i64:$dst, (mul i64:$src1, i64:$src2))]>;
-def MUL8S_ir : ALU_ir<0x1, 0x2, "mul8s $src1, $src2", [(set i64:$dst, (mul i64:$src1, i64:$src2))]>;
+def MUL8S_rr : ALU_rr<0x1, 0x3, "mul8s $src1, $src2", [(set i64:$dst, (mul i64:$src1, i64:$src2))]>;
+def MUL8S_ir : ALU_ir<0x1, 0x3, "mul8s $src1, $src2", [(set i64:$dst, (mul i64:$src1, i64:$src2))]>;
 def MULS : MnemonicAlias<"muls", "mul8s">;
 def MUL8 : MnemonicAlias<"mul8", "mul8s">;
 def MUL : MnemonicAlias<"mul", "mul8s">;
 
-def DIV8S_rr : ALU_rr<0x1, 0x2, "div8s $src1, $src2", [(set i64:$dst, (sdiv i64:$src1, i64:$src2))]>;
-def DIV8S_ir : ALU_ir<0x1, 0x2, "div8s $src1, $src2", [(set i64:$dst, (sdiv i64:$src1, i64:$src2))]>;
+def DIV8S_rr : ALU_rr<0x1, 0x4, "div8s $src1, $src2", [(set i64:$dst, (sdiv i64:$src1, i64:$src2))]>;
+def DIV8S_ir : ALU_ir<0x1, 0x4, "div8s $src1, $src2", [(set i64:$dst, (sdiv i64:$src1, i64:$src2))]>;
 def DIVS : MnemonicAlias<"divs", "div8s">;
 def DIV8 : MnemonicAlias<"div8", "div8s">;
 def DIV : MnemonicAlias<"div", "div8s">;
+
+def MOD8S_rr : ALU_rr<0x1, 0x5, "mod8s $src1, $src2", [(set i64:$dst, (srem i64:$src1, i64:$src2))]>;
+def MOD8S_ir : ALU_ir<0x1, 0x5, "mod8s $src1, $src2", [(set i64:$dst, (srem i64:$src1, i64:$src2))]>;
+def MODS : MnemonicAlias<"mods", "mod8s">;
+def MOD8 : MnemonicAlias<"mod8", "mod8s">;
+def MOD : MnemonicAlias<"mod", "mod8s">;
 
 // mov/memory
 def MOV8_rr : FARAInst<0x0, 0x1, 0x4,
