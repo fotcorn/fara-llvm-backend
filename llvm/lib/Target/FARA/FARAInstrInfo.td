@@ -63,6 +63,41 @@ def LD8_rr : FARAInst<0x0, 0x2, 0x4,
 }
 def LD : MnemonicAlias<"ld", "ld8">;
 
+// stack operations
+def PUSH8_r : FARAInst<0x5, 0x1, 0x4,
+  (outs),
+  (ins IntRegs:$data),
+  "push8 $data",
+  [],
+  InstFormatNoOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let mayStore = true;
+}
+def PUSH8_i : FARAInst<0x5, 0x1, 0x4,
+  (outs),
+  (ins i64imm_op:$data),
+  "push8 $data",
+  [],
+  InstFormatNoOut>
+{
+  let Inst{19-16} = 0x5; // 8 byte immediate
+  let mayStore = true;
+}
+def PUSH : MnemonicAlias<"push", "push8">;
+
+def POP8_r : FARAInst<0x5, 0x2, 0x4,
+  (outs IntRegs:$dst),
+  (ins),
+  "pop8 $dst",
+  [],
+  InstFormatOneOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let mayLoad = true;
+}
+def POP : MnemonicAlias<"pop", "pop8">;
+
 // jumps/branch
 def JMP : FARAInst<0x3, 0x1, 0x4,
   (outs),
