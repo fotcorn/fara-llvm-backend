@@ -128,7 +128,7 @@ def RET : FARAInst<0x5, 0x4, 0x0,
   let isReturn = 1;
 }
 
-def CALL : FARAInst<0x5, 0x3, 0x0,
+def CALL : FARAInst<0x5, 0x3, 0x4,
   (outs),
   (ins brtarget:$target),
   "call $target",
