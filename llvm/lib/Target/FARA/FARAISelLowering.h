@@ -20,10 +20,32 @@
 namespace llvm {
 class FARASubtarget;
 
+namespace FARAISD {
+enum NodeType : unsigned {
+  // Start the numbering from where ISD NodeType finishes.
+  FIRST_NUMBER = ISD::BUILTIN_OP_END,
+  RET_FLAG,
+};
+}
+
 class FARATargetLowering : public TargetLowering {
 public:
   explicit FARATargetLowering(const TargetMachine &TM,
                               const FARASubtarget &STI);
+
+  SDValue
+  LowerFormalArguments(SDValue /*Chain*/, CallingConv::ID /*CallConv*/,
+                       bool /*isVarArg*/,
+                       const SmallVectorImpl<ISD::InputArg> & /*Ins*/,
+                       const SDLoc & /*dl*/, SelectionDAG & /*DAG*/,
+                       SmallVectorImpl<SDValue> & /*InVals*/) const override;
+
+  SDValue LowerReturn(SDValue /*Chain*/, CallingConv::ID /*CallConv*/,
+                      bool /*isVarArg*/,
+                      const SmallVectorImpl<ISD::OutputArg> & /*Outs*/,
+                      const SmallVectorImpl<SDValue> & /*OutVals*/,
+                      const SDLoc & /*dl*/,
+                      SelectionDAG & /*DAG*/) const override;
 };
 } // namespace llvm
 
