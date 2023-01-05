@@ -33,6 +33,8 @@ public:
   explicit FARATargetLowering(const TargetMachine &TM,
                               const FARASubtarget &STI);
 
+  const char *getTargetNodeName(unsigned Opcode) const override;
+
   SDValue
   LowerFormalArguments(SDValue /*Chain*/, CallingConv::ID /*CallConv*/,
                        bool /*isVarArg*/,

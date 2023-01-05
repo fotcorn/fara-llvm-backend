@@ -27,6 +27,20 @@ FARATargetLowering::FARATargetLowering(const TargetMachine &TM,
   computeRegisterProperties(STI.getRegisterInfo());
 }
 
+
+const char *FARATargetLowering::getTargetNodeName(unsigned Opcode) const {
+#define NODE_NAME_CASE(NODE)                                                   \
+  case FARAISD::NODE:                                                         \
+    return "FARAISD::" #NODE;
+  switch ((FARAISD::NodeType)Opcode) {
+  case FARAISD::FIRST_NUMBER:
+    break;
+  NODE_NAME_CASE(RET_FLAG)
+    }
+  return nullptr;
+#undef NODE_NAME_CASE
+}
+
 SDValue FARATargetLowering::LowerFormalArguments(
     SDValue Chain, CallingConv::ID CallConv, bool /*isVarArg*/,
     const SmallVectorImpl<ISD::InputArg> &Ins, const SDLoc & /*dl*/,
