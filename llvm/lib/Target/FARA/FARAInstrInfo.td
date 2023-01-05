@@ -190,3 +190,5 @@ def HALT : FARAInst<0x8, 0x1, 0x0,
 {
   let hasSideEffects = 1;
 }
+
+def : Pat<(i64 i64imm_op:$imm), (MOV8_ir i64imm_op:$imm)>;

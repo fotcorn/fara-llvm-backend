@@ -22,7 +22,7 @@ def i32imm_op : Operand<i32> {
   let OperandType = "OPERAND_I32IMM";
 }
 
-def i64imm_op : Operand<i64> {
+def i64imm_op : Operand<i64>, ImmLeaf<i64, [{return isInt<64>(Imm);}]> {
   let OperandNamespace = "FARA";
   let OperandType = "OPERAND_I64IMM";
 }
