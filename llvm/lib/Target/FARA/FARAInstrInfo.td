@@ -1,5 +1,8 @@
 include "FARAInstrFormats.td"
 
+def retflag : SDNode<"FARAISD::RET_FLAG", SDTNone,
+                     [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
+
 // arithmetic
 def ADD8S_rr : ALU_rr<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADD8S_ir : ALU_ir<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
@@ -122,10 +125,11 @@ def RET : FARAInst<0x5, 0x4, 0x0,
   (outs),
   (ins),
   "ret",
-  [],
+  [(retflag)],
   InstFormatNoOut>
 {
   let isReturn = 1;
+  let isTerminator = 1;
 }
 
 def CALL : FARAInst<0x5, 0x3, 0x4,
