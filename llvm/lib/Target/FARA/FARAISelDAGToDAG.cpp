@@ -47,4 +47,12 @@ FunctionPass *llvm::createFARAISelDag(FARATargetMachine &TM) {
   return new FARADAGToDAGISel(TM);
 }
 
-void FARADAGToDAGISel::Select(SDNode *N) {}
+void FARADAGToDAGISel::Select(SDNode *N) {
+  SDLoc dl(N);
+  if (N->isMachineOpcode()) {
+    N->setNodeId(-1);
+    return; // Already selected.
+  }
+
+  SelectCode(N);
+}
