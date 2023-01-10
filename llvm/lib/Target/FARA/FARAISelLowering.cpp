@@ -15,6 +15,7 @@
 #include "FARA.h"
 #include "FARASubtarget.h"
 #include "llvm/CodeGen/CallingConvLower.h"
+#include "llvm/CodeGen/MachineFrameInfo.h"
 
 using namespace llvm;
 
@@ -27,47 +28,101 @@ FARATargetLowering::FARATargetLowering(const TargetMachine &TM,
   computeRegisterProperties(STI.getRegisterInfo());
 }
 
-
 const char *FARATargetLowering::getTargetNodeName(unsigned Opcode) const {
 #define NODE_NAME_CASE(NODE)                                                   \
-  case FARAISD::NODE:                                                         \
+  case FARAISD::NODE:                                                          \
     return "FARAISD::" #NODE;
   switch ((FARAISD::NodeType)Opcode) {
   case FARAISD::FIRST_NUMBER:
     break;
-  NODE_NAME_CASE(RET_FLAG)
-    }
+    NODE_NAME_CASE(RET_FLAG)
+  }
   return nullptr;
 #undef NODE_NAME_CASE
 }
 
+#include "FARAGenCallingConv.inc"
+
 SDValue FARATargetLowering::LowerFormalArguments(
-    SDValue Chain, CallingConv::ID CallConv, bool /*isVarArg*/,
-    const SmallVectorImpl<ISD::InputArg> &Ins, const SDLoc & /*dl*/,
-    SelectionDAG & /*DAG*/, SmallVectorImpl<SDValue> &InVals) const {
+    SDValue Chain, CallingConv::ID CallConv, bool IsVarArg,
+    const SmallVectorImpl<ISD::InputArg> &Ins, const SDLoc &DL,
+    SelectionDAG &DAG, SmallVectorImpl<SDValue> &InVals) const {
 
   if (CallConv != CallingConv::C) {
     report_fatal_error("Unsupported calling convention");
   }
-
-  if (Ins.size() != 0) {
-    report_fatal_error("Function arguments not yet supported");
+  if (IsVarArg) {
+    report_fatal_error("Vararg is not supported");
   }
 
-  if (InVals.size() != 0) {
-    report_fatal_error("Function arguments not yet supported");
+  MachineFunction &MF = DAG.getMachineFunction();
+  // Assign locations to all of the incoming arguments.
+  SmallVector<CCValAssign, 16> ArgLocs;
+  CCState CCInfo(CallConv, IsVarArg, MF, ArgLocs, *DAG.getContext());
+
+  CCInfo.AnalyzeFormalArguments(Ins, CC_FARA);
+
+  for (unsigned i = 0, e = ArgLocs.size(); i != e; ++i) {
+    CCValAssign &VA = ArgLocs[i];
+
+    if (VA.isRegLoc()) {
+      // This argument is passed in a register.
+      // All integer register arguments are promoted by the caller to i64.
+
+      // Create a virtual register for the promoted live-in value.
+      Register VReg =
+          MF.addLiveIn(VA.getLocReg(), getRegClassFor(VA.getLocVT()));
+      SDValue Arg = DAG.getCopyFromReg(Chain, DL, VReg, VA.getLocVT());
+
+      // The caller promoted the argument, so insert an Assert?ext SDNode so we
+      // won't promote the value again in this function.
+      switch (VA.getLocInfo()) {
+      case CCValAssign::SExt:
+        Arg = DAG.getNode(ISD::AssertSext, DL, VA.getLocVT(), Arg,
+                          DAG.getValueType(VA.getValVT()));
+        break;
+      case CCValAssign::ZExt:
+        Arg = DAG.getNode(ISD::AssertZext, DL, VA.getLocVT(), Arg,
+                          DAG.getValueType(VA.getValVT()));
+        break;
+      case CCValAssign::Full:
+        break;
+      default:
+        report_fatal_error("CCValAssign type not supported");
+      }
+
+      // Truncate the register down to the argument type.
+      if (VA.isExtInLoc())
+        Arg = DAG.getNode(ISD::TRUNCATE, DL, VA.getValVT(), Arg);
+
+      InVals.push_back(Arg);
+      continue;
+    }
+
+    // Only arguments pased on the stack should make it here.
+    assert(VA.isMemLoc());
+
+    // todo: maybe we need some additional offset here, ABI is not yet fully
+    // defined.
+    unsigned Offset = VA.getLocMemOffset();
+    unsigned ValSize = VA.getValVT().getSizeInBits() / 8;
+
+    int FI = MF.getFrameInfo().CreateFixedObject(ValSize, Offset, true);
+    InVals.push_back(
+        DAG.getLoad(VA.getValVT(), DL, Chain,
+                    DAG.getFrameIndex(FI, getPointerTy(MF.getDataLayout())),
+                    MachinePointerInfo::getFixedStack(MF, FI)));
   }
 
   return Chain;
 }
 
-#include "FARAGenCallingConv.inc"
-
-SDValue FARATargetLowering::LowerReturn(
-    SDValue Chain, CallingConv::ID CallConv, bool IsVarArg,
-    const SmallVectorImpl<ISD::OutputArg> & Outs,
-    const SmallVectorImpl<SDValue> & OutVals, const SDLoc & DL,
-    SelectionDAG & DAG) const {
+SDValue
+FARATargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
+                                bool IsVarArg,
+                                const SmallVectorImpl<ISD::OutputArg> &Outs,
+                                const SmallVectorImpl<SDValue> &OutVals,
+                                const SDLoc &DL, SelectionDAG &DAG) const {
   // CCValAssign - represent the assignment of the return value to a location
   SmallVector<CCValAssign, 16> RVLocs;
 
