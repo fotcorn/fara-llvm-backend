@@ -26,6 +26,12 @@ class FARASubtarget;
 class FARAInstrInfo : public FARAGenInstrInfo {
 public:
   explicit FARAInstrInfo(FARASubtarget &ST);
+
+  void loadRegFromStackSlot(MachineBasicBlock &MBB,
+                            MachineBasicBlock::iterator I, Register DestReg,
+                            int FI, const TargetRegisterClass *RC,
+                            const TargetRegisterInfo *TRI,
+                            Register VReg) const override;
 };
 
 } // namespace llvm
