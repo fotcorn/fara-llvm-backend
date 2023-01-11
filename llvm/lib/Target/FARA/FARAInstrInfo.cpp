@@ -47,3 +47,27 @@ void llvm::FARAInstrInfo::loadRegFromStackSlot(MachineBasicBlock &MBB,
     report_fatal_error("Can't load this register from stack slot");
   }
 }
+
+void llvm::FARAInstrInfo::storeRegToStackSlot(
+    MachineBasicBlock &MBB, MachineBasicBlock::iterator I, Register SrcReg,
+    bool isKill, int FI, const TargetRegisterClass *RC,
+    const TargetRegisterInfo *TRI, Register VReg) const {
+  DebugLoc DL;
+  if (I != MBB.end())
+    DL = I->getDebugLoc();
+
+  MachineFunction *MF = MBB.getParent();
+  const MachineFrameInfo &MFI = MF->getFrameInfo();
+  MachineMemOperand *MMO = MF->getMachineMemOperand(
+      MachinePointerInfo::getFixedStack(*MF, FI), MachineMemOperand::MOStore,
+      MFI.getObjectSize(FI), MFI.getObjectAlign(FI));
+
+  if (RC == &FARA::AllRegsRegClass || RC == &FARA::IntRegsRegClass) {
+    BuildMI(MBB, I, DL, get(FARA::STR8_rr))
+        .addFrameIndex(FI)
+        .addReg(SrcReg, getKillRegState(isKill))
+        .addMemOperand(MMO);
+  } else {
+    report_fatal_error("Can't store this register to stack slot");
+  }
+}

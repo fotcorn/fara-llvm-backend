@@ -32,6 +32,12 @@ public:
                             int FI, const TargetRegisterClass *RC,
                             const TargetRegisterInfo *TRI,
                             Register VReg) const override;
+
+  void storeRegToStackSlot(MachineBasicBlock &MBB,
+                           MachineBasicBlock::iterator I, Register SrcReg,
+                           bool isKill, int FI, const TargetRegisterClass *RC,
+                           const TargetRegisterInfo *TRI,
+                           Register VReg) const override;
 };
 
 } // namespace llvm
