@@ -86,6 +86,60 @@ def LD8_rr : FARAInst<0x0, 0x2, 0x4,
 }
 def LD : MnemonicAlias<"ld", "ld8">;
 
+def STRX8_rrr : FARAInst<0x0, 0x5, 0x4,
+  (outs),
+  (ins IntRegs:$data, IntRegs:$address, IntRegs:$offset),
+  "strx8 $data, $address, $offset",
+  [(store (add i64:$address, i64:$offset), i64:$data)],
+  InstFormatNoOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x1; // register
+  let Inst{27-24} = 0x1; // register
+
+  let mayStore = true;
+}
+def STRX8_rri : FARAInst<0x0, 0x5, 0x4,
+  (outs),
+  (ins IntRegs:$data, IntRegs:$address, i64imm_op:$offset),
+  "strx8 $data, $address, $offset",
+  [(store (add i64:$address, i64:$offset), i64:$data)],
+  InstFormatNoOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x1; // register
+  let Inst{27-24} = 0x5; // 8 byte immediate
+
+  let mayStore = true;
+}
+def STRX : MnemonicAlias<"strx", "strx8">;
+
+def LDX8_rrr : FARAInst<0x0, 0x4, 0x4,
+  (outs IntRegs:$target),
+  (ins IntRegs:$address, IntRegs:$offset),
+  "ldx8 $address, $offset, $target",
+  [(set i64:$target, (load (add i64:$address, i64:$offset)))],
+  InstFormatOneOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x1; // register
+  let Inst{27-24} = 0x1; // register
+  let mayLoad = true;
+}
+def LDX8_rir : FARAInst<0x0, 0x4, 0x4,
+  (outs IntRegs:$target),
+  (ins IntRegs:$address, i64imm_op:$offset),
+  "ldx8 $address, $offset, $target",
+  [(set i64:$target, (load (add i64:$address, i64:$offset)))],
+  InstFormatOneOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x5; // 8 byte immediate
+  let Inst{27-24} = 0x1; // register
+  let mayLoad = true;
+}
+def LDX : MnemonicAlias<"ldx", "ldx8">;
+
 // stack operations
 def PUSH8_r : FARAInst<0x5, 0x1, 0x4,
   (outs),
