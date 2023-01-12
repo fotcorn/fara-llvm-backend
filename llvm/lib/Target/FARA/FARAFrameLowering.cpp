@@ -45,9 +45,7 @@ void FARAFrameLowering::emitPrologue(MachineFunction &MF,
 }
 void FARAFrameLowering::emitEpilogue(MachineFunction &MF,
                                      MachineBasicBlock &MBB) const {
-
-
-  MachineBasicBlock::iterator MBBI = MBB.begin();
+  MachineBasicBlock::iterator MBBI = MBB.getLastNonDebugInstr();
   const FARAInstrInfo &TII = *STI.getInstrInfo();
   DebugLoc DL;
   
