@@ -42,9 +42,23 @@ BitVector FARARegisterInfo::getReservedRegs(const MachineFunction &MF) const {
   return Reserved;
 }
 
-bool FARARegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
+bool FARARegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MBBI,
                                            int SPAdj, unsigned FIOperandNum,
                                            RegScavenger *RS) const {
-  llvm_unreachable("FARARegisterInfo::eliminateFrameIndex not implemented");
+  MachineInstr &MI = *MBBI;
+  DebugLoc dl = MI.getDebugLoc();
+  int FrameIndex = MI.getOperand(FIOperandNum).getIndex();
+  MachineFunction &MF = *MI.getParent()->getParent();
+  const FARAFrameLowering *TFI = getFrameLowering(MF);
+
+  Register FrameReg;
+  int Offset;
+  Offset = TFI->getFrameIndexReference(MF, FrameIndex, FrameReg).getFixed();
+  Offset += MI.getOperand(FIOperandNum + 1).getImm();
+
+  MI.getOperand(FIOperandNum).ChangeToRegister(FrameReg, false);
+  MI.getOperand(FIOperandNum + 1).ChangeToImmediate(Offset);
+
+  // we updated the instruction, not replaced it
   return false;
 }

@@ -23,7 +23,7 @@ using namespace llvm;
 
 FARAInstrInfo::FARAInstrInfo(FARASubtarget &ST) : FARAGenInstrInfo() {}
 
-void llvm::FARAInstrInfo::loadRegFromStackSlot(MachineBasicBlock &MBB,
+void FARAInstrInfo::loadRegFromStackSlot(MachineBasicBlock &MBB,
                                                MachineBasicBlock::iterator I,
                                                Register DestReg, int FI,
                                                const TargetRegisterClass *RC,
@@ -40,21 +40,24 @@ void llvm::FARAInstrInfo::loadRegFromStackSlot(MachineBasicBlock &MBB,
       MFI.getObjectSize(FI), MFI.getObjectAlign(FI));
 
   if (RC == &FARA::AllRegsRegClass || RC == &FARA::IntRegsRegClass) {
-    BuildMI(MBB, I, DL, get(FARA::LD8_rr), DestReg)
+    // LDX8 %fp, imm_offset, %DestReg
+    BuildMI(MBB, I, DL, get(FARA::LDX8_rir))
+        .addReg(DestReg)
         .addFrameIndex(FI)
+        .addImm(0)
         .addMemOperand(MMO);
   } else {
     report_fatal_error("Can't load this register from stack slot");
   }
 }
 
-void llvm::FARAInstrInfo::storeRegToStackSlot(
-    MachineBasicBlock &MBB, MachineBasicBlock::iterator I, Register SrcReg,
+void FARAInstrInfo::storeRegToStackSlot(
+    MachineBasicBlock &MBB, MachineBasicBlock::iterator MBBI, Register SrcReg,
     bool isKill, int FI, const TargetRegisterClass *RC,
     const TargetRegisterInfo *TRI, Register VReg) const {
   DebugLoc DL;
-  if (I != MBB.end())
-    DL = I->getDebugLoc();
+  if (MBBI != MBB.end())
+    DL = MBBI->getDebugLoc();
 
   MachineFunction *MF = MBB.getParent();
   const MachineFrameInfo &MFI = MF->getFrameInfo();
@@ -63,11 +66,27 @@ void llvm::FARAInstrInfo::storeRegToStackSlot(
       MFI.getObjectSize(FI), MFI.getObjectAlign(FI));
 
   if (RC == &FARA::AllRegsRegClass || RC == &FARA::IntRegsRegClass) {
-    BuildMI(MBB, I, DL, get(FARA::STR8_rr))
-        .addFrameIndex(FI)
+    BuildMI(MBB, MBBI, DL, get(FARA::STRX8_rri))
         .addReg(SrcReg, getKillRegState(isKill))
+        .addFrameIndex(FI)
+        .addImm(0)
         .addMemOperand(MMO);
   } else {
     report_fatal_error("Can't store this register to stack slot");
+  }
+}
+
+void FARAInstrInfo::copyPhysReg(MachineBasicBlock &MBB,
+                                      MachineBasicBlock::iterator MBBI,
+                                      const DebugLoc &DL, MCRegister DestReg,
+                                      MCRegister SrcReg, bool KillSrc) const {
+  if (FARA::AllRegsRegClass.contains(DestReg, SrcReg))
+  {
+    BuildMI(MBB, MBBI, DL, get(FARA::MOV8_rr), DestReg)
+      .addReg(SrcReg, getKillRegState(KillSrc));
+    return;
+  }
+  else {
+    llvm_unreachable("Impossible reg-to-reg copy");
   }
 }

@@ -109,7 +109,6 @@ def STRX8_rri : FARAInst<0x0, 0x5, 0x4,
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
   let Inst{27-24} = 0x5; // 8 byte immediate
-
   let mayStore = true;
 }
 def STRX : MnemonicAlias<"strx", "strx8">;
