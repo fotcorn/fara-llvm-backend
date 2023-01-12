@@ -29,6 +29,7 @@ def i64imm_op : Operand<i64>, ImmLeaf<i64, [{return isInt<64>(Imm);}]> {
 
 def brtarget : Operand<OtherVT> {
   let OperandType = "OPERAND_PCREL";
+  let PrintMethod = "printBranchTarget";
 }
 
 // These definitions must be kept in-sync with FARABaseInfo.h.

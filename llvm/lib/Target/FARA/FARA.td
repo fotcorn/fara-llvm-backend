@@ -42,7 +42,12 @@ def : Proc<"FARA",      []>;
 // Declare the target which we are implementing
 //===----------------------------------------------------------------------===//
 
+def FARAAsmWriter : AsmWriter {
+  int PassSubtarget = 1;
+}
+
 def FARA : Target {
     // Pull in Instruction Info:
     let InstructionSet = FARAInstrInfo;
+    let AssemblyWriters = [FARAAsmWriter];
 }

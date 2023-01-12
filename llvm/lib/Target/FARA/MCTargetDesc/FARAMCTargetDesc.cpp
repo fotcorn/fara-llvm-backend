@@ -12,7 +12,7 @@
 
 #include "FARAMCTargetDesc.h"
 //#include "FARAELFStreamer.h"
-//#include "FARAInstPrinter.h"
+#include "FARAInstPrinter.h"
 #include "FARAMCAsmInfo.h"
 //#include "FARAMCObjectFileInfo.h"
 #include "FARATargetStreamer.h"
@@ -81,7 +81,6 @@ static MCSubtargetInfo *createFARAMCSubtargetInfo(const Triple &TT,
   return createFARAMCSubtargetInfoImpl(TT, CPU, /*TuneCPU*/ CPU, FS);
 }
 
-/*
 static MCInstPrinter *createFARAMCInstPrinter(const Triple &T,
                                                unsigned SyntaxVariant,
                                                const MCAsmInfo &MAI,
@@ -90,6 +89,7 @@ static MCInstPrinter *createFARAMCInstPrinter(const Triple &T,
   return new FARAInstPrinter(MAI, MII, MRI);
 }
 
+/*
 static MCTargetStreamer *
 createFARAObjectTargetStreamer(MCStreamer &S, const MCSubtargetInfo &STI) {
   const Triple &TT = STI.getTargetTriple();
@@ -124,7 +124,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeFARATargetMC() {
     TargetRegistry::RegisterMCRegInfo(*T, createFARAMCRegisterInfo);
     TargetRegistry::RegisterMCAsmBackend(*T, createFARAAsmBackend);
     TargetRegistry::RegisterMCCodeEmitter(*T, createFARAMCCodeEmitter);
-    // TargetRegistry::RegisterMCInstPrinter(*T, createFARAMCInstPrinter);
+    TargetRegistry::RegisterMCInstPrinter(*T, createFARAMCInstPrinter);
     TargetRegistry::RegisterMCSubtargetInfo(*T, createFARAMCSubtargetInfo);
     // TargetRegistry::RegisterELFStreamer(*T, createFARAELFStreamer);
     // TargetRegistry::RegisterMCInstrAnalysis(*T, createFARAInstrAnalysis);

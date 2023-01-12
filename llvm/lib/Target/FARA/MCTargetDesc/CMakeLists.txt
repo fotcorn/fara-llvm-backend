@@ -5,6 +5,7 @@ add_llvm_component_library(LLVMFARADesc
   FARAAsmBackend.cpp
   FARAELFObjectWriter.cpp
   FARAMCCodeEmitter.cpp
+  FARAInstPrinter.cpp
 
   LINK_COMPONENTS
   MC
