@@ -24,11 +24,14 @@ public:
   explicit FARAFrameLowering(const FARASubtarget &STI)
       : TargetFrameLowering(StackGrowsDown,
                             /*StackAlignment=*/Align(1),
-                            /*LocalAreaOffset=*/0) {}
+                            /*LocalAreaOffset=*/0), STI(STI) {}
 
   void emitPrologue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
   void emitEpilogue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
   bool hasFP(const MachineFunction &MF) const override;
+
+private:
+  const FARASubtarget &STI;
 };
 } // namespace llvm
 #endif
