@@ -33,9 +33,11 @@ def brtarget : Operand<OtherVT> {
 }
 
 def MEMrr : Operand<iPTR> {
+  let PrintMethod = "printMemOperand";
   let MIOperandInfo = (ops IntRegs:$r1, IntRegs:$r2);
 }
 def MEMri : Operand<iPTR> {
+  let PrintMethod = "printMemOperand";
   let MIOperandInfo = (ops IntRegs:$r, i64imm_op);
 }
 

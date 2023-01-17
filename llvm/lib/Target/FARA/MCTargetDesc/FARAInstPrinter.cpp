@@ -70,3 +70,11 @@ void FARAInstPrinter::printBranchTarget(const MCInst *MI, uint64_t Address,
     OS << MO.getImm();
   }
 }
+
+void FARAInstPrinter::printMemOperand(const MCInst *MI, int OpNum,
+                                      const MCSubtargetInfo &STI,
+                                      raw_ostream &OS) {
+  printOperand(MI, OpNum, STI, OS);
+  OS << ", ";
+  printOperand(MI, OpNum + 1, STI, OS);
+}
