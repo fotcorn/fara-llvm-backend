@@ -32,6 +32,16 @@ def brtarget : Operand<OtherVT> {
   let PrintMethod = "printBranchTarget";
 }
 
+def MEMrr : Operand<iPTR> {
+  let MIOperandInfo = (ops IntRegs:$r1, IntRegs:$r2);
+}
+def MEMri : Operand<iPTR> {
+  let MIOperandInfo = (ops IntRegs:$r, i64imm_op);
+}
+
+def ADDRrr : ComplexPattern<iPTR, 2, "SelectADDRrr", [], []>;
+def ADDRri : ComplexPattern<iPTR, 2, "SelectADDRri", [frameindex], []>;
+
 // These definitions must be kept in-sync with FARABaseInfo.h.
 class InstFormat<bits<4> val> {
   bits<4> Value = val;

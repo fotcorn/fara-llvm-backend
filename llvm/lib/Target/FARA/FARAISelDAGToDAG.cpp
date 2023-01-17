@@ -28,6 +28,8 @@ public:
   FARADAGToDAGISel(FARATargetMachine &TM) : SelectionDAGISel(ID, TM) {}
 
   void Select(SDNode *N) override;
+  bool SelectADDRri(SDValue Addr, SDValue &Base, SDValue &Offset);
+  bool SelectADDRrr(SDValue Addr, SDValue &Base, SDValue &Offset);
 
   StringRef getPassName() const override {
     return "FARA DAG->DAG Pattern Instruction Selection";
@@ -55,4 +57,20 @@ void FARADAGToDAGISel::Select(SDNode *N) {
   }
 
   SelectCode(N);
+}
+
+bool FARADAGToDAGISel::SelectADDRri(SDValue Addr, SDValue &Base,
+                                    SDValue &Offset) {
+  if (FrameIndexSDNode *FIN = dyn_cast<FrameIndexSDNode>(Addr)) {
+    Base = CurDAG->getTargetFrameIndex(
+        FIN->getIndex(), TLI->getPointerTy(CurDAG->getDataLayout()));
+    Offset = CurDAG->getTargetConstant(0, SDLoc(Addr), MVT::i64);
+    return true;
+  }
+  return false;
+}
+
+bool FARADAGToDAGISel::SelectADDRrr(SDValue Addr, SDValue &Base,
+                                    SDValue &Offset) {
+  return false;
 }
