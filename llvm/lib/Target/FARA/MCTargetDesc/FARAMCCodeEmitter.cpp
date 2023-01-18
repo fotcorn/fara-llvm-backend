@@ -81,6 +81,7 @@ void FARAMCCodeEmitter::encodeOperand(const unsigned int operandIndex,
       support::endian::write<int32_t>(OS, imm, support::big);
       break;
     case FARA::OPERAND_I64IMM:
+    case MCOI::OPERAND_UNKNOWN:
       support::endian::write<int64_t>(OS, imm, support::big);
       break;
     default:
