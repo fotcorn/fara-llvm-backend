@@ -13,6 +13,7 @@
 #include "FARARegisterInfo.h"
 #include "FARA.h"
 #include "FARASubtarget.h"
+#include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/CodeGen/MachineFunction.h"
 
 #define GET_REGINFO_TARGET_DESC
@@ -50,11 +51,17 @@ bool FARARegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MBBI,
   int FrameIndex = MI.getOperand(FIOperandNum).getIndex();
   MachineFunction &MF = *MI.getParent()->getParent();
   const FARAFrameLowering *TFI = getFrameLowering(MF);
+  MachineFrameInfo &MFI = MF.getFrameInfo();
 
   Register FrameReg;
   int Offset;
   Offset = TFI->getFrameIndexReference(MF, FrameIndex, FrameReg).getFixed();
   Offset += MI.getOperand(FIOperandNum + 1).getImm();
+
+  // if we have a frame pointer, we use the offset from there
+  if (TFI->hasFP(MF)) {
+    Offset = -MFI.getStackSize() + Offset;
+  }
 
   MI.getOperand(FIOperandNum).ChangeToRegister(FrameReg, false);
   MI.getOperand(FIOperandNum + 1).ChangeToImmediate(Offset);
