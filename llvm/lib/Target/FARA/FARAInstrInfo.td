@@ -3,6 +3,22 @@ include "FARAInstrFormats.td"
 def retflag : SDNode<"FARAISD::RET_FLAG", SDTNone,
                      [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
 
+//  These are target-independent nodes, but have target-specific formats.
+def SDT_FARACallSeqStart : SDCallSeqStart<[ SDTCisVT<0, i64>,
+                                          SDTCisVT<1, i64> ]>;
+def SDT_FARACallSeqEnd   : SDCallSeqEnd<[ SDTCisVT<0, i64>,
+                                        SDTCisVT<1, i64> ]>;
+
+def callseq_start : SDNode<"ISD::CALLSEQ_START", SDT_FARACallSeqStart,
+                           [SDNPHasChain, SDNPOutGlue]>;
+def callseq_end   : SDNode<"ISD::CALLSEQ_END",   SDT_FARACallSeqEnd,
+                           [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue]>;
+
+def SDT_FARACall    : SDTypeProfile<0, -1, [SDTCisVT<0, i32>]>;
+def call          : SDNode<"FARAISD::CALL", SDT_FARACall,
+                           [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue,
+                            SDNPVariadic]>;
+
 // arithmetic
 def ADD8S_rr : ALU_rr<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
 def ADD8S_ir : ALU_ir<0x1, 0x1, "add8s $src1, $src2", [(set i64:$dst, (add i64:$src1, i64:$src2))]>;
@@ -187,7 +203,7 @@ def RET : FARAInst<0x5, 0x4, 0x0,
 
 def CALL : FARAInst<0x5, 0x3, 0x4,
   (outs),
-  (ins brtarget:$target),
+  (ins calltarget:$target, variable_ops),
   "call $target",
   [],
   InstFormatNoOut>
@@ -249,3 +265,17 @@ def HALT : FARAInst<0x8, 0x1, 0x0,
 }
 
 def : Pat<(i64 i64imm_op:$imm), (MOV8_ir i64imm_op:$imm)>;
+
+// Pessimistically assume the stack pointer will be clobbered
+let Defs = [SP], Uses = [SP] in {
+def ADJCALLSTACKDOWN : Pseudo<(outs), (ins i64imm_op:$amt1, i64imm_op:$amt2),
+                              [(callseq_start timm:$amt1, timm:$amt2)]>;
+def ADJCALLSTACKUP   : Pseudo<(outs), (ins i64imm_op:$amt1, i64imm_op:$amt2),
+                              [(callseq_end timm:$amt1, timm:$amt2)]>;
+}
+
+// Calls
+def : Pat<(call tglobaladdr:$dst),
+          (CALL tglobaladdr:$dst)>;
+def : Pat<(call texternalsym:$dst),
+          (CALL texternalsym:$dst)>;

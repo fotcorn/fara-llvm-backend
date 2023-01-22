@@ -32,6 +32,8 @@ def brtarget : Operand<OtherVT> {
   let PrintMethod = "printBranchTarget";
 }
 
+def calltarget : Operand<i32>;
+
 def MEMrr : Operand<iPTR> {
   let PrintMethod = "printMemOperand";
   let MIOperandInfo = (ops IntRegs:$r1, IntRegs:$r2);
@@ -107,4 +109,10 @@ multiclass CondJump<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pat
   def : CondJump_rr<optype, opcode, asmstr, pattern>;
   def : CondJump_ir<optype, opcode, asmstr, pattern>;
   def : CondJump_ri<optype, opcode, asmstr, pattern>;
+}
+
+class Pseudo<dag outs, dag ins, list<dag> pattern>
+   : FARAInst<0, 0, 0, outs, ins, "", pattern, InstFormatNoOut> {
+  let isCodeGenOnly = 1;
+  let isPseudo = 1;
 }

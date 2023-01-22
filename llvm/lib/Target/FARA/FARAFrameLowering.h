@@ -24,11 +24,19 @@ public:
   explicit FARAFrameLowering(const FARASubtarget &STI)
       : TargetFrameLowering(StackGrowsDown,
                             /*StackAlignment=*/Align(1),
-                            /*LocalAreaOffset=*/0), STI(STI) {}
+                            /*LocalAreaOffset=*/0),
+        STI(STI) {}
 
   void emitPrologue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
   void emitEpilogue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
   bool hasFP(const MachineFunction &MF) const override;
+  MachineBasicBlock::iterator
+  eliminateCallFramePseudoInstr(MachineFunction &MF, MachineBasicBlock &MBB,
+                                MachineBasicBlock::iterator I) const override;
+
+  void emitSPAdjustment(MachineFunction &MF, MachineBasicBlock &MBB,
+                        MachineBasicBlock::iterator MBBI,
+                        int64_t NumBytes) const;
 
 private:
   const FARASubtarget &STI;

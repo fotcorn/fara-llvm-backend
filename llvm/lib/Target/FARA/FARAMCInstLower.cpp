@@ -12,6 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "FARA.h"
+#include "MCTargetDesc/FARAMCExpr.h"
 #include "llvm/CodeGen/AsmPrinter.h"
 #include "llvm/CodeGen/MachineBasicBlock.h"
 #include "llvm/CodeGen/MachineInstr.h"
@@ -24,6 +25,28 @@
 
 using namespace llvm;
 
+static MCOperand lowerSymbolOperand(const MachineInstr *MI,
+                                    const MachineOperand &MO, AsmPrinter &AP) {
+  FARAMCExpr::VariantKind Kind = (FARAMCExpr::VariantKind)MO.getTargetFlags();
+  const MCSymbol *Symbol = nullptr;
+
+  switch (MO.getType()) {
+  default:
+    llvm_unreachable("Unknown type in lowerSymbolOperand");
+  case MachineOperand::MO_MachineBasicBlock:
+    Symbol = MO.getMBB()->getSymbol();
+    break;
+
+  case MachineOperand::MO_GlobalAddress:
+    Symbol = AP.getSymbol(MO.getGlobal());
+    break;
+  }
+
+  const MCSymbolRefExpr *MCSym = MCSymbolRefExpr::create(Symbol, AP.OutContext);
+  const FARAMCExpr *expr = FARAMCExpr::create(MCSym, Kind, AP.OutContext);
+  return MCOperand::createExpr(expr);
+}
+
 static MCOperand lowerOperand(const MachineInstr *MI, const MachineOperand &MO,
                               AsmPrinter &AP) {
   switch (MO.getType()) {
@@ -34,32 +57,18 @@ static MCOperand lowerOperand(const MachineInstr *MI, const MachineOperand &MO,
     if (MO.isImplicit())
       break;
     return MCOperand::createReg(MO.getReg());
-
-  //case MachineOperand::MO_BlockAddress:
-  //  return LowerSymbolOperand(
-  //      MI, MO, AP.GetBlockAddressSymbol(MO.getBlockAddress()), AP);
-  //case MachineOperand::MO_ConstantPoolIndex:
-  //  return LowerSymbolOperand(MI, MO, AP.GetCPISymbol(MO.getIndex()), AP);
-  //case MachineOperand::MO_ExternalSymbol:
-  //  return LowerSymbolOperand(
-  //      MI, MO, AP.GetExternalSymbolSymbol(MO.getSymbolName()), AP);
-  //case MachineOperand::MO_GlobalAddress:
-  //  return LowerSymbolOperand(MI, MO, AP.getSymbol(MO.getGlobal()), AP);
+  case MachineOperand::MO_GlobalAddress:
+    return lowerSymbolOperand(MI, MO, AP);
   case MachineOperand::MO_Immediate:
     return MCOperand::createImm(MO.getImm());
-  //case MachineOperand::MO_JumpTableIndex:
-  //  return LowerSymbolOperand(MI, MO, AP.GetJTISymbol(MO.getIndex()), AP);
-  //case MachineOperand::MO_MachineBasicBlock:
-  //  return LowerSymbolOperand(MI, MO, MO.getMBB()->getSymbol(), AP);
-
-  //case MachineOperand::MO_RegisterMask:
-  //  break;
+  case MachineOperand::MO_RegisterMask:
+    break;
   }
   return MCOperand();
 }
 
 void llvm::lowerFARAMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
-                                   AsmPrinter &AP) {
+                                         AsmPrinter &AP) {
   OutMI.setOpcode(MI->getOpcode());
 
   for (const MachineOperand &MO : MI->operands()) {

@@ -21,7 +21,7 @@ using namespace llvm;
 #define GET_INSTRINFO_CTOR_DTOR
 #include "FARAGenInstrInfo.inc"
 
-FARAInstrInfo::FARAInstrInfo(FARASubtarget &ST) : FARAGenInstrInfo() {}
+FARAInstrInfo::FARAInstrInfo(FARASubtarget &ST) : FARAGenInstrInfo(FARA::ADJCALLSTACKDOWN, FARA::ADJCALLSTACKUP) {}
 
 void FARAInstrInfo::loadRegFromStackSlot(MachineBasicBlock &MBB,
                                                MachineBasicBlock::iterator I,

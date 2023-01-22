@@ -23,7 +23,7 @@ using namespace llvm;
 
 FARATargetLowering::FARATargetLowering(const TargetMachine &TM,
                                        const FARASubtarget &STI)
-    : TargetLowering(TM) {
+    : TargetLowering(TM), Subtarget(&STI) {
   addRegisterClass(MVT::i64, &FARA::IntRegsRegClass);
   computeRegisterProperties(STI.getRegisterInfo());
 }
@@ -36,6 +36,7 @@ const char *FARATargetLowering::getTargetNodeName(unsigned Opcode) const {
   case FARAISD::FIRST_NUMBER:
     break;
     NODE_NAME_CASE(RET_FLAG)
+    NODE_NAME_CASE(CALL)
   }
   return nullptr;
 #undef NODE_NAME_CASE
@@ -155,4 +156,143 @@ FARATargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
     RetOps.push_back(Flag);
 
   return DAG.getNode(FARAISD::RET_FLAG, DL, MVT::Other, RetOps);
+}
+
+SDValue FARATargetLowering::LowerCall(TargetLowering::CallLoweringInfo &CLI,
+                                      SmallVectorImpl<SDValue> &InVals) const {
+  SelectionDAG &DAG = CLI.DAG;
+  SDLoc DL = CLI.DL;
+  SDValue Chain = CLI.Chain;
+  auto PtrVT = getPointerTy(DAG.getDataLayout());
+
+  // FARA does not support tail call optimization yet
+  CLI.IsTailCall = false;
+  assert(!CLI.IsVarArg && "FARA does not support var args yet");
+
+  // Analyze operands of the call, assigning locations to each operand.
+  SmallVector<CCValAssign, 16> ArgLocs;
+  CCState CCInfo(CLI.CallConv, CLI.IsVarArg, DAG.getMachineFunction(), ArgLocs,
+                 *DAG.getContext());
+  CCInfo.AnalyzeCallOperands(CLI.Outs, CC_FARA);
+
+  // Adjust the stack pointer to make room for the arguments.
+  unsigned ArgsSize = CCInfo.getNextStackOffset();
+  Chain = DAG.getCALLSEQ_START(Chain, ArgsSize, 0, DL);
+
+  // Collect the set of registers to pass to the function and their values.
+  // This will be emitted as a sequence of CopyToReg nodes glued to the call
+  // instruction.
+  SmallVector<std::pair<Register, SDValue>, 8> RegsToPass;
+
+  // Collect chains from all the memory opeations that copy arguments to the
+  // stack. They must follow the stack pointer adjustment above and precede the
+  // call instruction itself.
+  SmallVector<SDValue, 8> MemOpChains;
+
+  for (unsigned i = 0, e = ArgLocs.size(); i != e; ++i) {
+    const CCValAssign &VA = ArgLocs[i];
+    SDValue Arg = CLI.OutVals[i];
+
+    // Promote the value if needed.
+    switch (VA.getLocInfo()) {
+    default:
+      llvm_unreachable("Unknown location info!");
+    case CCValAssign::Full:
+      break;
+    }
+
+    if (VA.isRegLoc()) {
+      RegsToPass.push_back(std::make_pair(VA.getLocReg(), Arg));
+      continue;
+    }
+
+    assert(VA.isMemLoc());
+
+    // Create a store off the stack pointer for this argument.
+    SDValue StackPtr = DAG.getRegister(FARA::SP, PtrVT);
+    SDValue PtrOff = DAG.getIntPtrConstant(VA.getLocMemOffset(), DL);
+    PtrOff = DAG.getNode(ISD::ADD, DL, PtrVT, StackPtr, PtrOff);
+    MemOpChains.push_back(
+        DAG.getStore(Chain, DL, Arg, PtrOff, MachinePointerInfo()));
+  }
+
+  // Emit all stores, make sure they occur before the call.
+  if (!MemOpChains.empty())
+    Chain = DAG.getNode(ISD::TokenFactor, DL, MVT::Other, MemOpChains);
+
+  // Build a sequence of CopyToReg nodes glued together with token chain and
+  // glue operands which copy the outgoing args into registers. The InGlue is
+  // necessary since all emitted instructions must be stuck together in order
+  // to pass the live physical registers.
+  SDValue InGlue;
+  for (auto &Reg : RegsToPass) {
+    Chain = DAG.getCopyToReg(Chain, DL, Reg.first, Reg.second, InGlue);
+    InGlue = Chain.getValue(1);
+  }
+
+  SDValue Callee = CLI.Callee;
+
+  // If the callee is a GlobalAddress/ExternalSymbol node, turn it into a
+  // TargetGlobalAddress/TargetExternalSymbol node so that legalize won't
+  // split it and then direct call can be matched by PseudoCALL.
+  if (GlobalAddressSDNode *S = dyn_cast<GlobalAddressSDNode>(Callee)) {
+    unsigned OpFlags = 0; // todo: check if we need some flags
+    Callee = DAG.getTargetGlobalAddress(S->getGlobal(), DL, PtrVT, 0, OpFlags);
+  } else if (ExternalSymbolSDNode *S = dyn_cast<ExternalSymbolSDNode>(Callee)) {
+    unsigned OpFlags = 0; // todo: check if we need some flags
+    Callee = DAG.getTargetExternalSymbol(S->getSymbol(), PtrVT, OpFlags);
+  }
+
+  // Build the operands for the call instruction itself.
+  SmallVector<SDValue, 8> Ops;
+  Ops.push_back(Chain);
+  Ops.push_back(Callee);
+  for (unsigned i = 0, e = RegsToPass.size(); i != e; ++i) {
+    Ops.push_back(DAG.getRegister(RegsToPass[i].first,
+                                  RegsToPass[i].second.getValueType()));
+  }
+
+  // Add a register mask operand representing the call-preserved registers.
+  const FARARegisterInfo *TRI = Subtarget->getRegisterInfo();
+  const uint32_t *Mask =
+      TRI->getCallPreservedMask(DAG.getMachineFunction(), CLI.CallConv);
+  assert(Mask && "Missing call preserved mask for calling convention");
+  Ops.push_back(DAG.getRegisterMask(Mask));
+
+  // Make sure the CopyToReg nodes are glued to the call instruction which
+  // consumes the registers.
+  if (InGlue.getNode())
+    Ops.push_back(InGlue);
+
+  // Emit the call.
+  SDVTList NodeTys = DAG.getVTList(MVT::Other, MVT::Glue);
+  Chain = DAG.getNode(FARAISD::CALL, DL, NodeTys, Ops);
+  InGlue = Chain.getValue(1);
+
+  // Revert the stack pointer immediately after the call.
+  Chain = DAG.getCALLSEQ_END(Chain, ArgsSize, 0, InGlue, DL);
+  InGlue = Chain.getValue(1);
+
+  // Assign locations to each value returned by this call.
+  SmallVector<CCValAssign, 16> RVLocs;
+  CCState RVInfo(CLI.CallConv, CLI.IsVarArg, DAG.getMachineFunction(), RVLocs,
+                 *DAG.getContext());
+
+  RVInfo.AnalyzeCallResult(CLI.Ins, RetCC_FARA);
+
+  // Copy all of the result registers out of their specified physreg.
+  for (auto &VA : RVLocs) {
+    // Copy the value out
+    SDValue RetValue =
+        DAG.getCopyFromReg(Chain, DL, VA.getLocReg(), VA.getLocVT(), InGlue);
+    // Glue the RetValue to the end of the call sequence
+    Chain = RetValue.getValue(1);
+    InGlue = RetValue.getValue(2);
+
+    assert(VA.getLocInfo() == CCValAssign::Full);
+
+    InVals.push_back(RetValue);
+  }
+
+  return Chain;
 }
