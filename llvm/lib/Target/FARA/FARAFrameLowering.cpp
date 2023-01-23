@@ -37,8 +37,8 @@ void FARAFrameLowering::emitPrologue(MachineFunction &MF,
         .addReg(FARA::FP)
         .addReg(FARA::SP);
     // sub <stack size>, %sp
-    BuildMI(MBB, MBBI, DL, TII.get(FARA::SUB8S_ir), FARA::SP)
-        .addImm(MFI.getStackSize())
+    BuildMI(MBB, MBBI, DL, TII.get(FARA::ADD8S_ir), FARA::SP)
+        .addImm(-MFI.getStackSize())
         .addReg(FARA::SP);
   }
 }
