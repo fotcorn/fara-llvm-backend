@@ -166,6 +166,13 @@ StringRef llvm::object::getELFRelocationTypeName(uint32_t Machine,
       break;
     }
     break;
+  case ELF::EM_FARA:
+    switch (Type) {
+#include "llvm/BinaryFormat/ELFRelocs/FARA.def"
+    default:
+      break;
+    }
+    break;
   case ELF::EM_LOONGARCH:
     switch (Type) {
 #include "llvm/BinaryFormat/ELFRelocs/LoongArch.def"

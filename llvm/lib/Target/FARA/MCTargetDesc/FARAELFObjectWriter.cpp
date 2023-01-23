@@ -38,7 +38,14 @@ unsigned FARAELFObjectWriter::getRelocType(MCContext &Ctx,
                                            const MCValue &Target,
                                            const MCFixup &Fixup,
                                            bool IsPCRel) const {
-  return 0;
+  assert(IsPCRel);
+  switch (Fixup.getKind()) {
+    case FK_PCRel_8:
+      return ELF::R_FARA_PCREL8;
+  default:
+    Ctx.reportError(Fixup.getLoc(), "Unsupported relocation type");
+    return ELF::R_FARA_NONE;
+  }
 }
 
 std::unique_ptr<MCObjectTargetWriter>

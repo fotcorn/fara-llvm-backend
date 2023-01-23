@@ -236,11 +236,9 @@ SDValue FARATargetLowering::LowerCall(TargetLowering::CallLoweringInfo &CLI,
   // TargetGlobalAddress/TargetExternalSymbol node so that legalize won't
   // split it and then direct call can be matched by PseudoCALL.
   if (GlobalAddressSDNode *S = dyn_cast<GlobalAddressSDNode>(Callee)) {
-    unsigned OpFlags = 0; // todo: check if we need some flags
-    Callee = DAG.getTargetGlobalAddress(S->getGlobal(), DL, PtrVT, 0, OpFlags);
+    Callee = DAG.getTargetGlobalAddress(S->getGlobal(), DL, PtrVT);
   } else if (ExternalSymbolSDNode *S = dyn_cast<ExternalSymbolSDNode>(Callee)) {
-    unsigned OpFlags = 0; // todo: check if we need some flags
-    Callee = DAG.getTargetExternalSymbol(S->getSymbol(), PtrVT, OpFlags);
+    Callee = DAG.getTargetExternalSymbol(S->getSymbol(), PtrVT);
   }
 
   // Build the operands for the call instruction itself.

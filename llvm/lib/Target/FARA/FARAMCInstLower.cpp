@@ -42,6 +42,8 @@ static MCOperand lowerSymbolOperand(const MachineInstr *MI,
     break;
   }
 
+  assert(MO.getOffset() == 0);
+
   const MCSymbolRefExpr *MCSym = MCSymbolRefExpr::create(Symbol, AP.OutContext);
   const FARAMCExpr *expr = FARAMCExpr::create(MCSym, Kind, AP.OutContext);
   return MCOperand::createExpr(expr);

@@ -908,6 +908,11 @@ enum {
 #include "ELFRelocs/CSKY.def"
 };
 
+// ELF Relocation types for FARA
+enum {
+#include "ELFRelocs/FARA.def"
+};
+
 // LoongArch Specific e_flags
 enum : unsigned {
   // Definitions from LoongArch ELF psABI v2.01.
