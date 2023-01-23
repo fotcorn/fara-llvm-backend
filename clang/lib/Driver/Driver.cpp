@@ -6150,6 +6150,9 @@ const ToolChain &Driver::getToolChain(const ArgList &Args,
       case llvm::Triple::csky:
         TC = std::make_unique<toolchains::CSKYToolChain>(*this, Target, Args);
         break;
+      case llvm::Triple::fara:
+        TC = std::make_unique<toolchains::BareMetal>(*this, Target, Args);
+        break;
       default:
         if (Target.getVendor() == llvm::Triple::Myriad)
           TC = std::make_unique<toolchains::MyriadToolChain>(*this, Target,
