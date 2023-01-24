@@ -67,6 +67,18 @@ bool FARADAGToDAGISel::SelectADDRri(SDValue Addr, SDValue &Base,
     Offset = CurDAG->getTargetConstant(0, SDLoc(Addr), MVT::i64);
     return true;
   }
+
+  if (CurDAG->isBaseWithConstantOffset(Addr)) {
+    SDLoc DL(Addr);
+    MVT VT = Addr.getSimpleValueType();
+    int64_t CVal = cast<ConstantSDNode>(Addr.getOperand(1))->getSExtValue();
+    Base = Addr.getOperand(0);
+    if (auto *FIN = dyn_cast<FrameIndexSDNode>(Base))
+      Base = CurDAG->getTargetFrameIndex(FIN->getIndex(), VT);
+    Offset = CurDAG->getTargetConstant(CVal, DL, VT);
+    return true;
+  }
+
   return false;
 }
 
