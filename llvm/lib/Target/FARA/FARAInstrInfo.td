@@ -203,7 +203,7 @@ def RET : FARAInst<0x5, 0x4, 0x0,
 
 def CALL : FARAInst<0x5, 0x3, 0x4,
   (outs),
-  (ins calltarget:$target, variable_ops),
+  (ins calltarget:$target),
   "call $target",
   [],
   InstFormatNoOut>
