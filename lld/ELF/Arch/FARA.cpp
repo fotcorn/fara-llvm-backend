@@ -45,7 +45,7 @@ RelExpr FARA::getRelExpr(RelType type, const Symbol &s,
 void FARA::relocate(uint8_t *loc, const Relocation &rel, uint64_t val) const {
   switch (rel.type) {
   case R_FARA_PCREL8:
-    write64be(loc, val);
+    write64be(loc, val - 8);
     break;
   default:
     llvm_unreachable("unknown relocation");
