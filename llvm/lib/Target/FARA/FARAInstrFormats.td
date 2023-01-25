@@ -112,9 +112,9 @@ class CondJump_ri<bits<8> optype, bits<8> opcode, string asmstr, list<dag> patte
 }
 
 multiclass CondJump<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern> {
-  def : CondJump_rr<optype, opcode, asmstr, pattern>;
-  def : CondJump_ir<optype, opcode, asmstr, pattern>;
-  def : CondJump_ri<optype, opcode, asmstr, pattern>;
+  def _rr : CondJump_rr<optype, opcode, asmstr, pattern>;
+  def _ir : CondJump_ir<optype, opcode, asmstr, pattern>;
+  def _ri : CondJump_ri<optype, opcode, asmstr, pattern>;
 }
 
 class Pseudo<dag outs, dag ins, list<dag> pattern>
