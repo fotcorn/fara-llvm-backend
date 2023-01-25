@@ -225,9 +225,9 @@ def JMP : FARAInst<0x3, 0x1, 0x4,
   let isTerminator = 1;
 }
 
-defm JE8 : CondJump<0x3, 0x2, "je8 $op1, $op2, $target", [(brcond (i64 (setne i64:$op1, i64:$op2)), bb:$target)]>;
+defm JE8 : CondJump<0x3, 0x2, "je8 $op1, $op2, $target", [(brcond (i64 (seteq i64:$op1, i64:$op2)), bb:$target)]>;
 def JE : MnemonicAlias<"je", "je8">;
-defm JNE8 : CondJump<0x3, 0x3, "jne8 $op1, $op2, $target", [(brcond (i64 (seteq i64:$op1, i64:$op2)), bb:$target)]>;
+defm JNE8 : CondJump<0x3, 0x3, "jne8 $op1, $op2, $target", [(brcond (i64 (setne i64:$op1, i64:$op2)), bb:$target)]>;
 def JNE : MnemonicAlias<"jne", "jne8">;
 
 // i/o
