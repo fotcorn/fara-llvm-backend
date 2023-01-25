@@ -26,6 +26,8 @@ FARATargetLowering::FARATargetLowering(const TargetMachine &TM,
     : TargetLowering(TM), Subtarget(&STI) {
   addRegisterClass(MVT::i64, &FARA::IntRegsRegClass);
   computeRegisterProperties(STI.getRegisterInfo());
+
+  setOperationAction(ISD::BR_CC, MVT::i64, Expand); // expand br_cc to brcond
 }
 
 const char *FARATargetLowering::getTargetNodeName(unsigned Opcode) const {

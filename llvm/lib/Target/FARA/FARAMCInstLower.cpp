@@ -42,8 +42,6 @@ static MCOperand lowerSymbolOperand(const MachineInstr *MI,
     break;
   }
 
-  assert(MO.getOffset() == 0);
-
   const MCSymbolRefExpr *MCSym = MCSymbolRefExpr::create(Symbol, AP.OutContext);
   const FARAMCExpr *expr = FARAMCExpr::create(MCSym, Kind, AP.OutContext);
   return MCOperand::createExpr(expr);
@@ -59,6 +57,7 @@ static MCOperand lowerOperand(const MachineInstr *MI, const MachineOperand &MO,
     if (MO.isImplicit())
       break;
     return MCOperand::createReg(MO.getReg());
+  case MachineOperand::MO_MachineBasicBlock:
   case MachineOperand::MO_GlobalAddress:
     return lowerSymbolOperand(MI, MO, AP);
   case MachineOperand::MO_Immediate:

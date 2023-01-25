@@ -95,6 +95,8 @@ void FARAMCCodeEmitter::encodeOperand(const unsigned int operandIndex,
     Fixups.push_back(MCFixup::create(OS.tell() - InstrStartPos, expr,
                                      MCFixupKind::FK_PCRel_8));
     support::endian::write<int64_t>(OS, 0, support::big);
+  } else {
+    llvm_unreachable("unknown operand type");
   }
 }
 

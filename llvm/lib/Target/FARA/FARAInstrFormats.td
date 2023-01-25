@@ -91,18 +91,24 @@ class CondJump_rr<bits<8> optype, bits<8> opcode, string asmstr, list<dag> patte
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
   let Inst{27-24} = 0x5; // 8 byte branch target
+  let isBranch = 1;
+  let isTerminator = 1;
 }
 class CondJump_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
   : FARAInst<optype, opcode, 0x4, (outs), (ins i64imm_op:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern, InstFormatNoOut> {
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
   let Inst{27-24} = 0x5; // 8 byte branch target
+  let isBranch = 1;
+  let isTerminator = 1;
 }
 class CondJump_ri<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
   : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, i64imm_op:$op2, brtarget:$target), asmstr, pattern, InstFormatNoOut> {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x5; // 8 byte immediate
   let Inst{27-24} = 0x5; // 8 byte branch target
+  let isBranch = 1;
+  let isTerminator = 1;
 }
 
 multiclass CondJump<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern> {
