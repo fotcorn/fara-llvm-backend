@@ -264,18 +264,18 @@ def HALT : FARAInst<0x8, 0x1, 0x0,
   let hasSideEffects = 1;
 }
 
+// Immediates
 def : Pat<(i64 i64imm_op:$imm), (MOV8_ir i64imm_op:$imm)>;
-
-// Pessimistically assume the stack pointer will be clobbered
-let Defs = [SP], Uses = [SP] in {
-def ADJCALLSTACKDOWN : Pseudo<(outs), (ins i64imm_op:$amt1, i64imm_op:$amt2),
-                              [(callseq_start timm:$amt1, timm:$amt2)]>;
-def ADJCALLSTACKUP   : Pseudo<(outs), (ins i64imm_op:$amt1, i64imm_op:$amt2),
-                              [(callseq_end timm:$amt1, timm:$amt2)]>;
-}
 
 // Calls
 def : Pat<(call tglobaladdr:$dst),
           (CALL tglobaladdr:$dst)>;
 def : Pat<(call texternalsym:$dst),
           (CALL texternalsym:$dst)>;
+
+let Defs = [SP], Uses = [SP] in {
+def ADJCALLSTACKDOWN : Pseudo<(outs), (ins i64imm_op:$amt1, i64imm_op:$amt2),
+                              [(callseq_start timm:$amt1, timm:$amt2)]>;
+def ADJCALLSTACKUP   : Pseudo<(outs), (ins i64imm_op:$amt1, i64imm_op:$amt2),
+                              [(callseq_end timm:$amt1, timm:$amt2)]>;
+}
