@@ -86,24 +86,29 @@ class ALU_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
   let Constraints = "$src2 = $dst";
 }
 
-class CondJump_rr<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern, InstFormatNoOut> {
+class CondJump_rr<bits<8> optype, bits<8> opcode, bits<4> size, string mnemonic, PatFrag compare> : FARAInst<
+    optype, opcode, size, (outs), (ins IntRegs:$op1, IntRegs:$op2, brtarget:$target),
+    !strconcat(mnemonic, " $op1, $op2, $target"), [(brcond (compare IntRegs:$op1, IntRegs:$op2), bb:$target)], InstFormatNoOut> {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x1; // register
   let Inst{27-24} = 0x5; // 8 byte branch target
   let isBranch = 1;
   let isTerminator = 1;
 }
-class CondJump_ir<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs), (ins i64imm_op:$op1, IntRegs:$op2, brtarget:$target), asmstr, pattern, InstFormatNoOut> {
+
+class CondJump_ir<bits<8> optype, bits<8> opcode, bits<4> size, string mnemonic, PatFrag compare> : FARAInst<
+    optype, opcode, size, (outs), (ins i64imm_op:$op1, IntRegs:$op2, brtarget:$target),
+    !strconcat(mnemonic, " $op1, $op2, $target"), [(brcond (compare i64imm_op:$op1, IntRegs:$op2), bb:$target)], InstFormatNoOut> {
   let Inst{19-16} = 0x5; // 8 byte immediate
   let Inst{31-28} = 0x1; // register
   let Inst{27-24} = 0x5; // 8 byte branch target
   let isBranch = 1;
   let isTerminator = 1;
 }
-class CondJump_ri<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern>
-  : FARAInst<optype, opcode, 0x4, (outs), (ins IntRegs:$op1, i64imm_op:$op2, brtarget:$target), asmstr, pattern, InstFormatNoOut> {
+
+class CondJump_ri<bits<8> optype, bits<8> opcode, bits<4> size, string mnemonic, PatFrag compare> : FARAInst<
+    optype, opcode, size, (outs), (ins IntRegs:$op1, i64imm_op:$op2, brtarget:$target),
+    !strconcat(mnemonic, " $op1, $op2, $target"), [(brcond (compare IntRegs:$op1, i64imm_op:$op2), bb:$target)], InstFormatNoOut> {
   let Inst{19-16} = 0x1; // register
   let Inst{31-28} = 0x5; // 8 byte immediate
   let Inst{27-24} = 0x5; // 8 byte branch target
@@ -111,10 +116,21 @@ class CondJump_ri<bits<8> optype, bits<8> opcode, string asmstr, list<dag> patte
   let isTerminator = 1;
 }
 
-multiclass CondJump<bits<8> optype, bits<8> opcode, string asmstr, list<dag> pattern> {
-  def _rr : CondJump_rr<optype, opcode, asmstr, pattern>;
-  def _ir : CondJump_ir<optype, opcode, asmstr, pattern>;
-  def _ri : CondJump_ri<optype, opcode, asmstr, pattern>;
+multiclass CondJump<bits<8> optype, bits<8> opcode, string mnemonic, PatFrag compare> {
+  def 8_rr : CondJump_rr<optype, opcode, 0x4, !strconcat(mnemonic, "8"), compare>;
+  def 4_rr : CondJump_rr<optype, opcode, 0x3, !strconcat(mnemonic, "4"), compare>;
+  def 2_rr : CondJump_rr<optype, opcode, 0x2, !strconcat(mnemonic, "2"), compare>;
+  def 1_rr : CondJump_rr<optype, opcode, 0x1, !strconcat(mnemonic, "1"), compare>;
+
+  def 8_ri : CondJump_ir<optype, opcode, 0x4, !strconcat(mnemonic, "8"), compare>;
+  def 4_ri : CondJump_ir<optype, opcode, 0x3, !strconcat(mnemonic, "4"), compare>;
+  def 2_ri : CondJump_ir<optype, opcode, 0x2, !strconcat(mnemonic, "2"), compare>;
+  def 1_ri : CondJump_ir<optype, opcode, 0x1, !strconcat(mnemonic, "1"), compare>;
+
+  def 8_ir : CondJump_rr<optype, opcode, 0x4, !strconcat(mnemonic, "8"), compare>;
+  def 4_ir : CondJump_rr<optype, opcode, 0x3, !strconcat(mnemonic, "4"), compare>;
+  def 2_ir : CondJump_rr<optype, opcode, 0x2, !strconcat(mnemonic, "2"), compare>;
+  def 1_ir : CondJump_rr<optype, opcode, 0x1, !strconcat(mnemonic, "1"), compare>;
 }
 
 class Pseudo<dag outs, dag ins, list<dag> pattern>
