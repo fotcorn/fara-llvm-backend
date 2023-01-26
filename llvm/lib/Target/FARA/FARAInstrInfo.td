@@ -102,11 +102,11 @@ def LD8_rr : FARAInst<0x0, 0x2, 0x4,
 }
 def LD : MnemonicAlias<"ld", "ld8">;
 
-def STRX8_rrr : FARAInst<0x0, 0x5, 0x4,
+class Store_rrr<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x5, size,
   (outs),
   (ins IntRegs:$data, (MEMrr $r1, $r2):$address),
-  "strx8 $data, $address",
-  [(store i64:$data, ADDRrr:$address)],
+  !strconcat("strx", sizeString, " $data, $address"),
+  [(op i64:$data, ADDRrr:$address)],
   InstFormatNoOut>
 {
   let Inst{19-16} = 0x1; // register
@@ -115,11 +115,11 @@ def STRX8_rrr : FARAInst<0x0, 0x5, 0x4,
 
   let mayStore = true;
 }
-def STRX8_rri : FARAInst<0x0, 0x5, 0x4,
+class Store_rri<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x5, size,
   (outs),
   (ins IntRegs:$data, (MEMri $r, $imm):$address),
-  "strx8 $data, $address",
-  [(store i64:$data, ADDRri:$address)],
+  !strconcat("strx", sizeString, " $data, $address"),
+  [(op i64:$data, ADDRri:$address)],
   InstFormatNoOut>
 {
   let Inst{19-16} = 0x1; // register
@@ -127,6 +127,14 @@ def STRX8_rri : FARAInst<0x0, 0x5, 0x4,
   let Inst{27-24} = 0x5; // 8 byte immediate
   let mayStore = true;
 }
+multiclass Store<string sizeString, bits<4> size, PatFrag op> {
+  def _rrr : Store_rri<sizeString, size, op>;
+  def _rri : Store_rri<sizeString, size, op>;
+}
+defm STRX8 : Store<"8", 0x4, store>;
+defm STRX4 : Store<"4", 0x3, truncstorei32>;
+defm STRX2 : Store<"2", 0x2, truncstorei16>;
+defm STRX1 : Store<"1", 0x1, truncstorei8>;
 def STRX : MnemonicAlias<"strx", "strx8">;
 
 def LDX8_rrr : FARAInst<0x0, 0x4, 0x4,
