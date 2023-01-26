@@ -228,8 +228,34 @@ def JMP : FARAInst<0x3, 0x1, 0x4,
 defm JE : CondJump<0x3, 0x2, "je", seteq>;
 def : MnemonicAlias<"je", "je8">;
 
-defm JNE : CondJump<0x3, 0x3, "jne", seteq>;
+defm JNE : CondJump<0x3, 0x3, "jne", setne>;
 def : MnemonicAlias<"jne", "jne8">;
+
+// lower
+defm JLS : CondJump<0x4, 0x1, "jls", setlt>;
+def : MnemonicAlias<"jls", "jls8">;
+def : MnemonicAlias<"jl", "jls8">;
+defm JLU : CondJump<0x4, 0x2, "jlu", setult>;
+def : MnemonicAlias<"jlu", "jlu8">;
+
+defm JLES : CondJump<0x4, 0x3, "jles", setle>;
+def : MnemonicAlias<"jles", "jles8">;
+def : MnemonicAlias<"jle", "jles8">;
+defm JLEU : CondJump<0x4, 0x4, "jleu", setule>;
+def : MnemonicAlias<"jleu", "jleu8">;
+
+// greater
+defm JGS : CondJump<0x4, 0x5, "jgs", setgt>;
+def : MnemonicAlias<"jgs", "jgs8">;
+def : MnemonicAlias<"jg", "jgs8">;
+defm JGU : CondJump<0x4, 0x6, "jgu", setugt>;
+def : MnemonicAlias<"jgu", "jgu8">;
+
+defm JGES : CondJump<0x4, 0x7, "jges", setge>;
+def : MnemonicAlias<"jges", "jges8">;
+def : MnemonicAlias<"jge", "jges8">;
+defm JGEU : CondJump<0x4, 0x8, "jgeu", setuge>;
+def : MnemonicAlias<"jgeu", "jgeu8">;
 
 // i/o
 def OUT1_ii : FARAInst<0x6, 0x2, 0x1,
