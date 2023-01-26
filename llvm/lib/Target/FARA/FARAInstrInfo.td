@@ -102,6 +102,7 @@ def LD8_rr : FARAInst<0x0, 0x2, 0x4,
 }
 def LD : MnemonicAlias<"ld", "ld8">;
 
+// indexed store
 class Store_rrr<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x5, size,
   (outs),
   (ins IntRegs:$data, (MEMrr $r1, $r2):$address),
@@ -137,11 +138,12 @@ defm STRX2 : Store<"2", 0x2, truncstorei16>;
 defm STRX1 : Store<"1", 0x1, truncstorei8>;
 def STRX : MnemonicAlias<"strx", "strx8">;
 
-def LDX8_rrr : FARAInst<0x0, 0x4, 0x4,
+// indexed load
+class Load_rrr<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x5, size,
   (outs IntRegs:$target),
   (ins (MEMrr $r1, $r2):$address),
-  "ldx8 $address, $target",
-  [(set i64:$target, (load ADDRrr:$address))],
+  !strconcat("ldx", sizeString, " $address, $target"),
+  [(set i64:$target, (op ADDRrr:$address))],
   InstFormatOneOut>
 {
   let Inst{19-16} = 0x1; // register
@@ -149,11 +151,11 @@ def LDX8_rrr : FARAInst<0x0, 0x4, 0x4,
   let Inst{27-24} = 0x1; // register
   let mayLoad = true;
 }
-def LDX8_rir : FARAInst<0x0, 0x4, 0x4,
+class Load_rir<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x5, size,
   (outs IntRegs:$target),
   (ins (MEMri $r, $imm):$address),
-  "ldx8 $address, $target",
-  [(set i64:$target, (load ADDRri:$address))],
+  !strconcat("ldx", sizeString, " $address, $target"),
+  [(set i64:$target, (op ADDRri:$address))],
   InstFormatOneOut>
 {
   let Inst{19-16} = 0x1; // register
@@ -161,6 +163,14 @@ def LDX8_rir : FARAInst<0x0, 0x4, 0x4,
   let Inst{27-24} = 0x1; // register
   let mayLoad = true;
 }
+multiclass Load<string sizeString, bits<4> size, PatFrag op> {
+  def _rrr : Load_rrr<sizeString, size, op>;
+  def _rir : Load_rir<sizeString, size, op>;
+}
+defm LDX8 : Load<"8", 0x4, load>;
+defm LDX4 : Load<"4", 0x3, sextloadi32>;
+defm LDX2 : Load<"2", 0x2, sextloadi16>;
+defm LDX1 : Load<"1", 0x1, sextloadi8>;
 def LDX : MnemonicAlias<"ldx", "ldx8">;
 
 // stack operations
