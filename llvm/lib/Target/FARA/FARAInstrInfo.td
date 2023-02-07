@@ -168,9 +168,9 @@ multiclass Load<string sizeString, bits<4> size, PatFrag op> {
   def _rir : Load_rir<sizeString, size, op>;
 }
 defm LDX8 : Load<"8", 0x4, load>;
-defm LDX4 : Load<"4", 0x3, sextloadi32>;
-defm LDX2 : Load<"2", 0x2, sextloadi16>;
-defm LDX1 : Load<"1", 0x1, sextloadi8>;
+defm LDX4 : Load<"4", 0x3, extloadi32>;
+defm LDX2 : Load<"2", 0x2, extloadi16>;
+defm LDX1 : Load<"1", 0x1, extloadi8>;
 def LDX : MnemonicAlias<"ldx", "ldx8">;
 
 // stack operations
