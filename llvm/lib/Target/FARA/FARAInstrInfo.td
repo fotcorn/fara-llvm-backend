@@ -139,7 +139,7 @@ defm STRX1 : Store<"1", 0x1, truncstorei8>;
 def STRX : MnemonicAlias<"strx", "strx8">;
 
 // indexed load
-class Load_rrr<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x5, size,
+class Load_rrr<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x4, size,
   (outs IntRegs:$target),
   (ins (MEMrr $r1, $r2):$address),
   !strconcat("ldx", sizeString, " $address, $target"),
@@ -151,7 +151,7 @@ class Load_rrr<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x5,
   let Inst{27-24} = 0x1; // register
   let mayLoad = true;
 }
-class Load_rir<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x5, size,
+class Load_rir<string sizeString, bits<4> size, PatFrag op> : FARAInst<0x0, 0x4, size,
   (outs IntRegs:$target),
   (ins (MEMri $r, $imm):$address),
   !strconcat("ldx", sizeString, " $address, $target"),
