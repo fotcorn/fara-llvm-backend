@@ -55,7 +55,7 @@ def MOV8_rr : FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
   (ins IntRegs:$src),
   "mov8 $src, $dst",
-  [(set i64:$dst, i64:$src)],
+  [],
   InstFormatOneOut>
 {
   let Inst{19-16} = 0x1; // register
@@ -67,7 +67,7 @@ def MOV8_ir: FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
   (ins i64imm_op:$src),
   "mov8 $src, $dst",
-  [(set i64:$dst, i64:$src)],
+  [],
   InstFormatOneOut>
 {
   let Inst{19-16} = 0x5; // 8 byte immediate
