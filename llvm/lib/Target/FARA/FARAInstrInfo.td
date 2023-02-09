@@ -193,6 +193,31 @@ defm LDX2 : Load<"2", 0x2, extloadi16>;
 defm LDX1 : Load<"1", 0x1, extloadi8>;
 def LDX : MnemonicAlias<"ldx", "ldx8">;
 
+// load effective address
+def LEA8_rrr : FARAInst<0x0, 0x6, 0x4,
+  (outs IntRegs:$target),
+  (ins (MEMrr $r1, $r2):$address),
+  "lea8 $address, $target",
+  [],
+  InstFormatOneOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x1; // register
+  let Inst{27-24} = 0x1; // register
+}
+def LEA8_rir : FARAInst<0x0, 0x6, 0x4,
+  (outs IntRegs:$target),
+  (ins (MEMri $r, $imm):$address),
+  "lea8 $address, $target",
+  [],
+  InstFormatOneOut>
+{
+  let Inst{19-16} = 0x1; // register
+  let Inst{31-28} = 0x5; // 8 byte immediate
+  let Inst{27-24} = 0x1; // register
+}
+def LEA : MnemonicAlias<"ldx", "ldx8">;
+
 // stack operations
 def PUSH8_r : FARAInst<0x5, 0x1, 0x4,
   (outs),
@@ -346,3 +371,7 @@ def ADJCALLSTACKDOWN : Pseudo<(outs), (ins i64imm_op:$amt1, i64imm_op:$amt2),
 def ADJCALLSTACKUP   : Pseudo<(outs), (ins i64imm_op:$amt1, i64imm_op:$amt2),
                               [(callseq_end timm:$amt1, timm:$amt2)]>;
 }
+
+// frame index
+def : Pat<(ADDRri IntRegs:$reg, i64imm_op:$imm),
+          (LEA8_rir IntRegs:$reg, i64imm_op:$imm)>;
