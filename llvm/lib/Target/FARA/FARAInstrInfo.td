@@ -50,6 +50,26 @@ def MODS : MnemonicAlias<"mods", "mod8s">;
 def MOD8 : MnemonicAlias<"mod8", "mod8s">;
 def MOD : MnemonicAlias<"mod", "mod8s">;
 
+def SL8S_rr : ALU_rr<0x2, 0x5, "sl8s $src1, $src2", [(set i64:$dst, (shl i64:$src1, i64:$src2))]> {
+  let Constraints = "$src1 = $dst";
+}
+def SL8S_ir : ALU_ir<0x2, 0x5, "sl8s $src1, $src2", [(set i64:$dst, (shl i64:$src1, i64:$src2))]> {
+  let Constraints = "$src1 = $dst";
+}
+def SLS : MnemonicAlias<"sls", "sl8s">;
+def SL8 : MnemonicAlias<"sl8", "sl8s">;
+def SL : MnemonicAlias<"sl", "sl8s">;
+
+def SR8S_rr : ALU_rr<0x2, 0x6, "sr8s $src1, $src2", [(set i64:$dst, (srl i64:$src1, i64:$src2))]> {
+  let Constraints = "$src1 = $dst";
+}
+def SR8S_ir : ALU_ir<0x2, 0x6, "sr8s $src1, $src2", [(set i64:$dst, (srl i64:$src1, i64:$src2))]> {
+  let Constraints = "$src1 = $dst";
+}
+def SRS : MnemonicAlias<"srs", "sr8s">;
+def SR8 : MnemonicAlias<"sr8", "sr8s">;
+def SR : MnemonicAlias<"sr", "sr8s">;
+
 // mov/memory
 def MOV8_rr : FARAInst<0x0, 0x1, 0x4,
   (outs IntRegs:$dst),
