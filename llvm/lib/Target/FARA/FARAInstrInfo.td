@@ -98,7 +98,7 @@ def MOV : MnemonicAlias<"mov", "mov8">;
 
 def STR8_rr : FARAInst<0x0, 0x3, 0x4,
   (outs),
-  (ins IntRegs:$data, IntRegs:$address),
+  (ins IntRegs:$address, IntRegs:$data),
   "str8 $data, $address",
   [(store i64:$address, i64:$data)],
   InstFormatNoOut>
