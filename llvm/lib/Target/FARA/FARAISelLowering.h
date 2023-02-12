@@ -31,6 +31,7 @@ enum NodeType : unsigned {
 
 class FARATargetLowering : public TargetLowering {
   const FARASubtarget *Subtarget;
+
 public:
   explicit FARATargetLowering(const TargetMachine &TM,
                               const FARASubtarget &STI);
@@ -50,6 +51,9 @@ public:
 
   SDValue LowerCall(TargetLowering::CallLoweringInfo &CLI,
                     SmallVectorImpl<SDValue> &InVals) const override;
+
+  SDValue LowerOperation(SDValue Op, SelectionDAG &DAG) const override;
+  SDValue lowerGlobalAddress(SDValue Op, SelectionDAG &DAG) const;
 };
 } // namespace llvm
 

@@ -28,6 +28,8 @@ FARATargetLowering::FARATargetLowering(const TargetMachine &TM,
   computeRegisterProperties(STI.getRegisterInfo());
 
   setOperationAction(ISD::BR_CC, MVT::i64, Expand); // expand br_cc to brcond
+
+  setOperationAction(ISD::GlobalAddress, MVT::i64, Custom);
 }
 
 const char *FARATargetLowering::getTargetNodeName(unsigned Opcode) const {
@@ -295,4 +297,35 @@ SDValue FARATargetLowering::LowerCall(TargetLowering::CallLoweringInfo &CLI,
   }
 
   return Chain;
+}
+
+SDValue llvm::FARATargetLowering::LowerOperation(SDValue Op,
+                                                 SelectionDAG &DAG) const {
+  switch (Op.getOpcode()) {
+  default:
+    report_fatal_error("unimplemented operand");
+  case ISD::GlobalAddress:
+    return lowerGlobalAddress(Op, DAG);
+  }
+}
+
+SDValue FARATargetLowering::lowerGlobalAddress(SDValue Op,
+                                               SelectionDAG &DAG) const {
+  GlobalAddressSDNode *N = cast<GlobalAddressSDNode>(Op);
+  SDLoc DL(N);
+  EVT Ty = getPointerTy(DAG.getDataLayout());
+
+  if (isPositionIndependent()) {
+    llvm_unreachable("Position independen global addresses not yet handled.");
+  }
+
+  switch (getTargetMachine().getCodeModel()) {
+  default:
+    llvm_unreachable("Unsupported absolute code model");
+  case CodeModel::Small:
+  case CodeModel::Medium:
+  case CodeModel::Large:
+    SDValue Addr = DAG.getTargetGlobalAddress(N->getGlobal(), DL, Ty, 0);
+    return SDValue(DAG.getMachineNode(FARA::MOV8_ir, DL, MVT::i64, Addr), 0);
+  }
 }
