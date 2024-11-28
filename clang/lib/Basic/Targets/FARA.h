@@ -65,7 +65,7 @@ public:
     static const char *const GCCRegNames[] = {
         "i0", "i1", "i2", "i3", "i4", "i5", "i6", "i7",
     };
-    return llvm::makeArrayRef(GCCRegNames);
+    return llvm::ArrayRef(GCCRegNames);
   }
 
   ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {

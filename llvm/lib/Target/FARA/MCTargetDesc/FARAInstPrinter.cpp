@@ -24,8 +24,8 @@ using namespace llvm;
 #define PRINT_ALIAS_INSTR
 #include "FARAGenAsmWriter.inc"
 
-void FARAInstPrinter::printRegName(raw_ostream &OS, unsigned RegNo) const {
-  OS << '%' << StringRef(getRegisterName(RegNo)).lower();
+void FARAInstPrinter::printRegName(raw_ostream &OS, MCRegister Reg) const {
+  OS << '%' << StringRef(getRegisterName(Reg)).lower();
 }
 
 void FARAInstPrinter::printInst(const MCInst *MI, uint64_t Address,
